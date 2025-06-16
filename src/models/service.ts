@@ -6,6 +6,13 @@ import {
   DataTypes,
 } from "sequelize";
 import sequelize from "../connectDb";
+import { ref } from "process";
+
+
+interface Result {
+  propertyValue: string;
+  refValue: string;
+}
 
 class Service extends Model<
   InferAttributes<Service>,
@@ -13,15 +20,22 @@ class Service extends Model<
 > {
   declare id: CreationOptional<number>;
   declare name: string;
-  declare properties: Record<string, string>; 
+  declare properties: CreationOptional<Result[]> 
   declare price: number;
 
-  public addProperty(propertyName: string, propertyValue: string) {
-    this.properties[propertyName] = propertyValue;
+  public async addProperty(propertyValue: string, refValue: string) {
+    const newProperty = {propertyValue, refValue}
+
+   if (!this.properties) {
+  this.properties = [];
+}
+this.properties.push(newProperty);
+await this.save()
   }
 
-  public changePricing(newPrice: number) {
+  public async  changePricing(newPrice: number) {
     this.price = newPrice;
+    await this.save()
   }
 }
 
@@ -38,7 +52,7 @@ Service.init(
       type: DataTypes.STRING,
     },
     properties: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.JSON,  
     },
     price: {

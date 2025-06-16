@@ -2,13 +2,33 @@ import statusCode from "http-status-codes";
 import { Request, Response } from "express";
 import { Service } from "../models/association"; 
 
+
+interface Property {
+  propertyValue: string;
+  refValue: string;
+}
+
 const createService = async (req: Request, res: Response) => {
   try {
-    const { name, price, properties }: { name: string; price: number; properties?: Record<string, string> } = req.body;
+    const {
+      name,
+      price,
+      properties = [],
+    }: { name: string; price: number; properties?: Property[] } = req.body;
 
-    if (!name || !price || !properties) {
+    if (!name || typeof price !== "number") {
       return res.status(statusCode.BAD_REQUEST).json({
-        msg: "Missing required fields: name, price, or properties",
+        msg: "Missing or invalid required fields: name and price are required",
+      });
+    }
+
+    const _serviceExist = await Service.findOne({
+      where: { name },
+    });
+
+    if (_serviceExist) {
+      return res.status(statusCode.CONFLICT).json({
+        msg: `Service with name "${name}" already exists.`,
       });
     }
 
@@ -22,7 +42,6 @@ const createService = async (req: Request, res: Response) => {
       msg: "Service created successfully",
       data: newService,
     });
-
   } catch (error) {
     console.error("Error creating service:", error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
