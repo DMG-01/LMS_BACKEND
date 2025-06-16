@@ -6,19 +6,13 @@ import {
   DataTypes
 } from "sequelize";
 import sequelize from "../connectDb";
-import {Service} from "../models/association"
+import { Service } from "../models/association";
+
 
 interface Result {
   propertyValue: string;
   refValue: string;
   actualValue?: string;
-}
-
-interface ServiceInterface {
-  serviceId: number;
-  serviceName: string;
-  price: number;
-  result: Result[];
 }
 
 class Register extends Model<
@@ -30,72 +24,67 @@ class Register extends Model<
   declare lastName: string;
   declare phoneNumber: string;
   declare email: CreationOptional<string>;
-  declare services: CreationOptional<ServiceInterface[]>;
+  declare services: CreationOptional<number[]>;
+  declare results: CreationOptional<Result[]>;
   declare amountPaid: CreationOptional<number>;
   declare supposedAmountPaid: CreationOptional<number>;
 
-  public  async addService(
-    serviceId: number
-  ) {
 
-   const _service = await Service.findOne({
-      where : {
-         id : serviceId
-      }
-   })
+  public async addService(serviceId: number) {
+    const _service = await Service.findOne({ where: { id: serviceId } });
 
-   if(!_service) {
+    if (!_service) {
       return {
-         errorCode : 404, 
-         msg : `no service with id ${serviceId} found`
-      }
-   }
-
-    const service: ServiceInterface = {
-      serviceId : _service.id,
-      serviceName : _service.name,
-      price : _service.price,
-      result : _service.properties
-    };
+        errorCode: 404,
+        msg: `No service with id ${serviceId} found`
+      };
+    }
 
     if (!this.services) {
       this.services = [];
     }
 
-    (this.services as ServiceInterface[]).push(service);
-    await this.save()
-  }
+    if (this.services.includes(serviceId)) {
+      return {
+        errorCode: 409,
+        msg: `Service with ID ${serviceId} already exists for this user.`
+      };
+    }
 
- public async removeService(serviceId: number) {
-  if (!this.services || !(this.services as ServiceInterface[]).length) {
+    this.services.push(serviceId);
+    await this.save();
+
     return {
-      errorCode: 400,
-      msg: "No services found for this user."
+      success: true,
+      msg: `Service ID ${serviceId} added successfully.`
     };
   }
 
-  const serviceIndex = (this.services as ServiceInterface[]).findIndex(
-    (s) => s.serviceId === serviceId
-  );
+  // Remove service by ID
+  public async removeService(serviceId: number) {
+    if (!this.services || this.services.length === 0) {
+      return {
+        errorCode: 400,
+        msg: "No services found for this user."
+      };
+    }
 
-  if (serviceIndex === -1) {
+    const index = this.services.findIndex((s) => s === serviceId);
+    if (index === -1) {
+      return {
+        errorCode: 404,
+        msg: `Service with ID ${serviceId} not found.`
+      };
+    }
+
+    this.services.splice(index, 1);
+    await this.save();
+
     return {
-      errorCode: 404,
-      msg: `Service with ID ${serviceId} not found.`
+      success: true,
+      msg: `Service ID ${serviceId} removed successfully.`
     };
   }
-
-
-  (this.services as ServiceInterface[]).splice(serviceIndex, 1);
-
-  
-  await this.save();
-
-  return {
-    success: true,
-    msg: `Service with ID ${serviceId} removed successfully.`
-  };
-}
 
 
   public async setResult(
@@ -103,34 +92,32 @@ class Register extends Model<
     propertyValue: string,
     actualValue: string
   ) {
-    const service = (this.services as ServiceInterface[]).find(
-      (s) => s.serviceId === serviceId
-    );
-
-    if (!service) {
+    if (!this.results) {
       return {
-        errorCode: 404,
-        msg: `No service with serviceId ${serviceId} found`
+        errorCode: 400,
+        msg: "No results array found in register."
       };
     }
 
-    const result = service.result.find(
+    const result = this.results.find(
       (r) => r.propertyValue === propertyValue
     );
 
     if (!result) {
       return {
         errorCode: 404,
-        msg: `No property "${propertyValue}" in service "${service.serviceName}"`
+        msg: `No property "${propertyValue}" found in results`
       };
     }
 
     result.actualValue = actualValue;
-    await this.save()
-    return { success: true };
+    await this.save();
+
+    return { success: true, msg: `Result updated.` };
   }
 }
 
+// Sequelize model definition
 Register.init(
   {
     id: {
@@ -156,8 +143,13 @@ Register.init(
       allowNull: true
     },
     services: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSON, 
       allowNull: false,
+      defaultValue: []
+    },
+    results: {
+      type: DataTypes.JSON,
+      allowNull: true,
       defaultValue: []
     },
     amountPaid: {
