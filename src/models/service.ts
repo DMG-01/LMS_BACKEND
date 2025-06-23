@@ -31,8 +31,7 @@ class Service extends Model<
      availableProp = await TestParameter.findOne({
       where : {
         testId : this.id, 
-        name : propertyName, 
-        unit : propertyUnit
+        name : propertyName
       }
     })
 
@@ -41,7 +40,7 @@ class Service extends Model<
         testId : this.id, 
         name : propertyName, 
         unit : propertyUnit, 
-        referenceValue : refValue
+        referenceValue : refValue, 
       })
 
       return availableProp
@@ -76,8 +75,10 @@ class Service extends Model<
       }, 
       include : [{
         model : TestParameter, 
-        as : "parameters"
-      }]
+        as : "parameters", 
+        attributes : ["name", "unit", "referenceValue"]
+      }], 
+      attributes: ["name", "price",]
     })
     return serviceDetail
 

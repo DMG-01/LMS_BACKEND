@@ -122,14 +122,15 @@ const addNewPropertyToService = async(req :Request, res : Response)=> {
       })
       return
     }
-
+    console.log('adding new parameters')
     const newService = await _service?.addnewProperties(newPropertyName, newPropertyRefValue, newPropertyUnit)
      if(newService) {
       res.status(statusCode.OK).json({
-        newService
+        newPropery : newService
       })
      }
   }catch(error) {
+    console.log(error)
     res.status(statusCode.INTERNAL_SERVER_ERROR).json({error})
     throw new Error("INTERNAL_SERVER_ERROR")
      
@@ -175,4 +176,34 @@ const removePropertyToService = async(req:Request, res : Response) => {
   }
 }
 
-export {createService,removePropertyToService, changeServicePrice, getAllService, addNewPropertyToService};
+
+const returnServiceDetail = async(req :Request, res :Response)=> {
+
+  try {
+    const _service = await Service.findOne({
+      where : {
+        id : req.params.serviceId
+      }
+    }) 
+
+    if(!_service) {
+      res.status(statusCode.NOT_FOUND).json({
+        msg : `no service with id ${req.params.id} found`
+      })
+      return
+    }
+    const _serviceDetail = await _service.getServiceDetail()
+
+    return res.status(statusCode.OK).json({
+      _serviceDetail
+    })
+
+  }catch(error) {
+    console.log(error)
+    res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+      msg : "INTERNAL_SERVER_ERROR"
+    })
+  }
+}
+
+export {createService,returnServiceDetail,removePropertyToService, changeServicePrice, getAllService, addNewPropertyToService};

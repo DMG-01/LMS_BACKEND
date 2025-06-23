@@ -1,5 +1,6 @@
 import express, {RequestHandler} from "express";
-import { createService, changeServicePrice, getAllService} from "../controllers/service";
+import {createService,removePropertyToService, changeServicePrice, returnServiceDetail, getAllService, addNewPropertyToService} from "../controllers/service";
+import { wrap } from "module";
 
 const serviceRouter = express.Router();
 
@@ -11,8 +12,11 @@ const wrapMiddleware = (fn: Function): RequestHandler => {
 
 
 serviceRouter.post("/service", wrapMiddleware(createService));
+serviceRouter.get("/service/:serviceId", wrapMiddleware(returnServiceDetail))
 serviceRouter.get("/service", wrapMiddleware(getAllService))
 serviceRouter.patch("/service/change_price", wrapMiddleware(changeServicePrice))
+serviceRouter.delete("/service/remove_property", wrapMiddleware(removePropertyToService))
+serviceRouter.patch("/service/addProperty", wrapMiddleware(addNewPropertyToService))
 
 
 export default serviceRouter;

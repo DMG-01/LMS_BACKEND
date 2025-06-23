@@ -27,11 +27,12 @@ TestParameter.init({
     }, 
     unit : {
         type : DataTypes.STRING, 
-        allowNull : false 
+        allowNull : true 
     }, 
     referenceValue : {
         type:DataTypes.STRING, 
-        allowNull : false
+        allowNull : true,
+        defaultValue : "none"
     }
 }, {
     timestamps : true, 
