@@ -1,12 +1,13 @@
-import {DataType,Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize} from "sequelize"
+import {DataType,Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize, DateOnlyDataType, CreationOptional} from "sequelize"
 import sequelize from "../connectDb"
 
 
 class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttributes<PatientTest>> {
-    declare id: number
+    declare id: CreationOptional<number>
     declare patientId : number
+    declare testId : number
     declare status : string
-    declare dateTaken : string
+    declare dateTaken : DateOnlyDataType
 }
 PatientTest.init({
 
@@ -18,6 +19,10 @@ PatientTest.init({
     }, 
     patientId : {
         type: DataTypes.INTEGER, 
+        allowNull : false
+    }, 
+    testId : {
+        type :DataTypes.INTEGER, 
         allowNull : false
     }, 
     status : {

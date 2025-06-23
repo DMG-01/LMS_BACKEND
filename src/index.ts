@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import sequelize from "./connectDb"
 import serviceRouter from "./routes/service"
+import registerRouter from "./routes/registerRoute"
 import { register } from "module";
 dotenv.config();
 
@@ -10,6 +11,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(serviceRouter)
+app.use(registerRouter)
 
 app.get("/", (req, res) => {
   res.send("Hello from TypeScript + Express!");
