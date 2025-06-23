@@ -81,8 +81,6 @@ class Service extends Model<
     })
     return serviceDetail
 
-   
-
   }
 
   public async changePricing(newPrice : number) : Promise<number> {

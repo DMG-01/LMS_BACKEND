@@ -104,4 +104,75 @@ const getAllService = async(req : Request, res : Response) => {
     }
 }
 
-export {createService, changeServicePrice, getAllService};
+const addNewPropertyToService = async(req :Request, res : Response)=> {
+  
+  try {
+
+    const {serviceId, newPropertyName , newPropertyRefValue, newPropertyUnit } = req.body
+
+    const _service = await Service.findOne({
+      where : {
+        id : serviceId
+      }
+    })
+
+    if(!_service) {
+      res.status(statusCode.NOT_FOUND).json({
+        msg : `service with id ${serviceId} not found`
+      })
+      return
+    }
+
+    const newService = await _service?.addnewProperties(newPropertyName, newPropertyRefValue, newPropertyUnit)
+     if(newService) {
+      res.status(statusCode.OK).json({
+        newService
+      })
+     }
+  }catch(error) {
+    res.status(statusCode.INTERNAL_SERVER_ERROR).json({error})
+    throw new Error("INTERNAL_SERVER_ERROR")
+     
+  }
+}
+
+const removePropertyToService = async(req:Request, res : Response) => {
+
+  try {
+    const {serviceId, propertyId} = req.body
+
+    if(!serviceId || !propertyId) {
+      res.status(statusCode.BAD_REQUEST).json({
+        msg : "missing required parameter"
+      })
+      return
+    }
+
+    const _service = await Service.findOne({
+      where : {
+        id : serviceId
+      }
+    })
+
+    if(!_service) {
+      res.status(statusCode.NOT_FOUND).json({
+        msg : `nno service with id ${serviceId} found`
+      })
+    }
+
+    const deleted = await _service?.removeProperty(propertyId)
+    if(deleted === "propery deleted") {
+      res.status(statusCode.OK).json({
+        msg : deleted
+      })
+    }
+
+  }catch(error) {
+    res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+      error
+    })
+    throw new Error("INTERNAL_SERVER_ERROR")
+  }
+}
+
+export {createService,removePropertyToService, changeServicePrice, getAllService, addNewPropertyToService};
