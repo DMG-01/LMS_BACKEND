@@ -5,8 +5,10 @@ import {
   CreationOptional,
   DataTypes,
 } from "sequelize";
+
 import sequelize from "../connectDb";
 import { ref } from "process";
+import TestParameter from "./testParamaeters";
 
 
 interface Result {
@@ -21,6 +23,67 @@ class Service extends Model<
   declare id: CreationOptional<number>;
   declare name: string;
   declare price: number;
+
+  public  async addnewProperties(propertyName : string, refValue : string, propertyUnit? : any) {
+
+     let availableProp
+
+     availableProp = await TestParameter.findOne({
+      where : {
+        testId : this.id, 
+        name : propertyName, 
+        unit : propertyUnit
+      }
+    })
+
+    if(!availableProp) {
+      availableProp = await TestParameter.create({
+        testId : this.id, 
+        name : propertyName, 
+        unit : propertyUnit, 
+        referenceValue : refValue
+      })
+
+      return availableProp
+    } else {
+      throw new Error("property already exist")
+    }
+
+    
+
+  }
+
+  public async removeProperty(propertyId : number) {
+
+    const propToDelete = await TestParameter.findOne({
+      where : {
+        id : propertyId
+      }
+    })
+    if(propToDelete) {
+    await propToDelete?.destroy()
+    return "propery deleted"
+  }else {
+    throw new Error(`property of id ${propertyId} not found `)
+  }
+}
+
+  public async getServiceDetail() {
+
+    const serviceDetail = await Service.findOne({
+      where : {
+        id : this.id
+      }, 
+      include : [{
+        model : TestParameter, 
+        as : "parameters"
+      }]
+    })
+    return serviceDetail
+
+   
+
+  }
 
   public async changePricing(newPrice : number) : Promise<number> {
     this.price = newPrice

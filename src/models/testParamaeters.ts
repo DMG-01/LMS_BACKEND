@@ -3,7 +3,7 @@ import sequelize from "../connectDb"
 import { Test } from "supertest"
 
 class TestParameter extends Model<InferAttributes<TestParameter>, InferCreationAttributes<TestParameter>> {
-    declare id : number;
+    declare id : CreationOptional<number>;
     declare testId : number;
     declare name : string;
     declare unit : string;
