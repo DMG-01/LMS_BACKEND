@@ -3,18 +3,13 @@ import { Request, Response } from "express";
 import { Service } from "../models/association"; 
 
 
-interface Property {
-  propertyValue: string;
-  refValue: string;
-}
 
 const createService = async (req: Request, res: Response) => {
   try {
     const {
       name,
-      price,
-      properties = [],
-    }: { name: string; price: number; properties?: Property[] } = req.body;
+      price
+    }: { name: string; price: number } = req.body;
 
     if (!name || typeof price !== "number") {
       return res.status(statusCode.BAD_REQUEST).json({
