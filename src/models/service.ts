@@ -20,22 +20,12 @@ class Service extends Model<
 > {
   declare id: CreationOptional<number>;
   declare name: string;
-  declare properties: CreationOptional<Result[]> 
   declare price: number;
 
-  public async addProperty(propertyValue: string, refValue: string) {
-    const newProperty = {propertyValue, refValue}
-
-   if (!this.properties) {
-  this.properties = [];
-}
-this.properties.push(newProperty);
-await this.save()
-  }
-
-  public async  changePricing(newPrice: number) {
-    this.price = newPrice;
+  public async changePricing(newPrice : number) : Promise<number> {
+    this.price = newPrice
     await this.save()
+    return 1
   }
 }
 
@@ -50,10 +40,6 @@ Service.init(
     name: {
       allowNull: false,
       type: DataTypes.STRING,
-    },
-    properties: {
-      allowNull: true,
-      type: DataTypes.JSON,  
     },
     price: {
       allowNull: false,

@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
-import Register from "./register";
 import Patient from "./patient";
 import Service from "./service";
+import patientTestTable from "./patientTestTable";
+import TestParameter from "./testParamaeters";
+import TestResult from "./testResult";
 
 dotenv.config();
 
@@ -16,26 +18,16 @@ const sequelize = new Sequelize(
   }
 );
 
-// PATIENT --< REGISTER
-Patient.hasMany(Register, {
-  foreignKey: "patientId",
-  as: "registers",
-});
+Patient.hasMany(patientTestTable, { foreignKey: "patientId", as: "tests" });
+patientTestTable.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
 
-Register.belongsTo(Patient, {
-  foreignKey: "patientId",
-  as: "patient",
-});
+patientTestTable.hasMany(Service, { foreignKey: "testVisitId", as: "services" });
+Service.belongsTo(patientTestTable, { foreignKey: "testVisitId", as: "visit" });
 
-// REGISTER --< SERVICE
-Register.hasMany(Service, {
-  foreignKey: "registerId",
-  as: "serviceRecords", // 🔁 renamed to avoid collision
-});
+Service.hasMany(TestParameter, { foreignKey: "serviceId", as: "parameters" });
+TestParameter.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
 
-Service.belongsTo(Register, {
-  foreignKey: "registerId",
-  as: "register",
-});
+TestParameter.hasMany(TestResult, { foreignKey: "parameterId", as: "results" });
+TestResult.belongsTo(TestParameter, { foreignKey: "parameterId", as: "parameter" });
 
-export { Register, Patient, Service, sequelize };
+export { Patient, Service,patientTestTable, TestParameter, TestResult, sequelize };

@@ -34,8 +34,7 @@ const createService = async (req: Request, res: Response) => {
 
     const newService = await Service.create({
       name,
-      price,
-      properties,
+      price
     });
 
     return res.status(statusCode.CREATED).json({
@@ -74,14 +73,15 @@ const changeServicePrice = async(req:Request, res : Response) => {
             return
         }
 
-        _service.changePricing(newPrice)
-        await _service.save()
-
+       const priceChange =await  _service.changePricing(newPrice)
+      
+          if(priceChange === 1) {
          res.status(statusCode.OK).json({
             msg : `service with id ${id} pricing changed`
         })
         return
-
+      }
+        
     }catch(error) {
         console.error(`Error Changing service price : ${error}`)
             res.status(statusCode.INTERNAL_SERVER_ERROR).json({
