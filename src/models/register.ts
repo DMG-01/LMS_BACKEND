@@ -31,19 +31,23 @@ class Register extends Model<
 
 
   public async addService(serviceId: number) {
+
+    //find service
     const _service = await Service.findOne({ where: { id: serviceId } });
 
+    //if service not found return an error of not found
     if (!_service) {
       return {
         errorCode: 404,
         msg: `No service with id ${serviceId} found`
       };
     }
-
+    //if no prior service found create a new empty array 
     if (!this.services) {
       this.services = [];
     }
 
+    //if a service array exist check if the serviceId is already there  if yes, return an error
     if (this.services.includes(serviceId)) {
       return {
         errorCode: 409,
@@ -51,6 +55,7 @@ class Register extends Model<
       };
     }
 
+    //push the service into the array 
     this.services.push(serviceId);
     await this.save();
 
@@ -60,23 +65,26 @@ class Register extends Model<
     };
   }
 
-  // Remove service by ID
+
   public async removeService(serviceId: number) {
+
+    //check if the service array is empty
     if (!this.services || this.services.length === 0) {
       return {
         errorCode: 400,
         msg: "No services found for this user."
       };
     }
-
+    //find the index of the service
     const index = this.services.findIndex((s) => s === serviceId);
+    //if the index does not exist throw an error
     if (index === -1) {
       return {
         errorCode: 404,
         msg: `Service with ID ${serviceId} not found.`
       };
     }
-
+// remove the index
     this.services.splice(index, 1);
     await this.save();
 
@@ -92,6 +100,8 @@ class Register extends Model<
     propertyValue: string,
     actualValue: string
   ) {
+    // returns an error if the result array is empty  
+    //@issue result array would always be empty at first 
     if (!this.results) {
       return {
         errorCode: 400,
@@ -117,7 +127,7 @@ class Register extends Model<
   }
 }
 
-// Sequelize model definition
+
 Register.init(
   {
     id: {

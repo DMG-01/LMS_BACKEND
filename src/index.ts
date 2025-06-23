@@ -22,3 +22,5 @@ app.listen(PORT, async () => {
     sequelize.sync({ alter: true })
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+export default app
