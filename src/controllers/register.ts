@@ -13,8 +13,8 @@ interface patientPayLoad {
 const RegisterAPatient = async(payload : patientPayLoad) => {
 
     const {firstName, lastName, phoneNumber, email, dateOfBirth, servicesId } = payload 
-
-    if(!firstName.trim() || !lastName.trim() || !phoneNumber.trim() || !Array.isArray(servicesId)) {
+            
+    try {
 
         let _patient = await Patient.findOne({
             where : {
@@ -45,12 +45,19 @@ const RegisterAPatient = async(payload : patientPayLoad) => {
                             status :"uncompleted", 
                             dateTaken : new DATEONLY()
                         })
+                          
                     }
                     }
-                
-                    return  await  Patient.findOne({
+                    const totalCount = await Patient.findAndCountAll({
                         where : {
-                            phoneNumber : phoneNumber
+                            phoneNumber 
+                        }
+                    })
+                    console.log(totalCount)
+                    return  await  Patient.findAll({
+                        where : {
+                            phoneNumber : phoneNumber,
+                            id : totalCount
                         }, 
                         include :[{
                             model : patientTestTable, 
@@ -74,8 +81,11 @@ const RegisterAPatient = async(payload : patientPayLoad) => {
                         }]
                     })
     
-    } else {
+                 }catch(error) {
+                    throw new Error(`${error}`)
+                 }
+        
         throw new Error("missing required paramater")
     }
-}
+
 export {RegisterAPatient}

@@ -4,10 +4,10 @@ import { Test } from "supertest"
 
 class TestParameter extends Model<InferAttributes<TestParameter>, InferCreationAttributes<TestParameter>> {
     declare id : CreationOptional<number>;
-    declare testId : number;
     declare name : string;
     declare unit : string;
     declare referenceValue : string;
+    declare serviceId : number 
 }
 
 TestParameter.init({
@@ -16,11 +16,7 @@ TestParameter.init({
         allowNull : false, 
         autoIncrement : true, 
         type : DataTypes.INTEGER
-    }, 
-    testId : {
-        type : DataTypes.INTEGER,
-        allowNull : false
-    }, 
+    },
     name : {
         type : DataTypes.STRING, 
         allowNull : false
@@ -33,11 +29,15 @@ TestParameter.init({
         type:DataTypes.STRING, 
         allowNull : true,
         defaultValue : "none"
+    }, 
+    serviceId : {
+        type : DataTypes.INTEGER, 
+        allowNull : false
     }
 }, {
     timestamps : true, 
     tableName : "testParameter",
-    modelName :"testParaneter", 
+    modelName :"testParameter", 
     sequelize
 })
 

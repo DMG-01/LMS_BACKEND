@@ -10,6 +10,7 @@ registerRouter.post("/register", async(req: Request, res : Response)=> {
     if(patientInReg) {
         res.status(statusCodes.CREATED).json({msg:`patient successfully registered`,patientInReg })
     }}catch(error) {
+        console.log(error)
         res.status(statusCodes.INTERNAL_SERVER_ERROR).json({msg : `INTERNAL_SERVER_ERROR`, error})
     }
 })

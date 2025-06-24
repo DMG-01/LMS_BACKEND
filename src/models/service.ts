@@ -30,14 +30,14 @@ class Service extends Model<
 
      availableProp = await TestParameter.findOne({
       where : {
-        testId : this.id, 
+        serviceId : this.id, 
         name : propertyName
       }
     })
 
     if(!availableProp) {
       availableProp = await TestParameter.create({
-        testId : this.id, 
+        serviceId : this.id, 
         name : propertyName, 
         unit : propertyUnit, 
         referenceValue : refValue, 
