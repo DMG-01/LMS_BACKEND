@@ -225,6 +225,40 @@ const getAllServices = async(req:Request, res : Response)=> {
         })
     }
 }
-  export {createNewServiceTemplate, removeProperty, changePrice,getAllServices, addNewProperty}
+
+
+const returnAService = async(req : Request, res : Response)=> {
+
+    try {
+    const _service = await ServiceTemplate.findOne({
+        where : {
+            id : req.params.serviceId
+        }, 
+        include : [{
+            model :TestParameterTemplate,
+            as : "serviceTemplateId"
+        }]
+    })
+
+    if(!_service) {
+        res.status(statusCodes.NOT_FOUND).json({
+            msg : ` no service with id ${req.params.id} found`
+        })
+        return
+    }
+
+    res.status(statusCodes.OK).json({
+        _service
+    })
+    return
+}catch(error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+        msg : `INTERNAL_SERVER_ERROR`
+    })
+    return
+}
+
+}
+  export {createNewServiceTemplate, returnAService,  removeProperty, changePrice,getAllServices, addNewProperty}
 
 
