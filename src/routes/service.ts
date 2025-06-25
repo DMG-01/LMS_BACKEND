@@ -1,5 +1,5 @@
-/*import express, {RequestHandler} from "express";
-import {createService,removePropertyToService, changeServicePrice, returnServiceDetail, getAllService, addNewPropertyToService} from "../controllers/serviceTemplate";
+import express, {RequestHandler} from "express";
+import {createNewServiceTemplate, removeProperty, changePrice, addNewProperty} from "../controllers/serviceTemplate";
 import { wrap } from "module";
 
 const serviceRouter = express.Router();
@@ -11,13 +11,12 @@ const wrapMiddleware = (fn: Function): RequestHandler => {
 };
 
 
-serviceRouter.post("/service", wrapMiddleware(createService));
-serviceRouter.get("/service/:serviceId", wrapMiddleware(returnServiceDetail))
+serviceRouter.post("/service", createNewServiceTemplate);
+serviceRouter.get("/service/:serviceId", )
 serviceRouter.get("/service", wrapMiddleware(getAllService))
-serviceRouter.patch("/service/change_price", wrapMiddleware(changeServicePrice))
-serviceRouter.delete("/service/remove_property", wrapMiddleware(removePropertyToService))
-serviceRouter.patch("/service/addProperty", wrapMiddleware(addNewPropertyToService))
+serviceRouter.patch("/service/change_price", changePrice)
+serviceRouter.delete("/service/remove_property", removeProperty)
+serviceRouter.patch("/service/addProperty", addNewProperty)
 
 
 export default serviceRouter;
-*/

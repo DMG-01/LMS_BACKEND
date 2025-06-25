@@ -1,6 +1,7 @@
-import {Service, ServiceTemplate} from "../models/association"
+import {Service, ServiceTemplate, TestParameterTemplate} from "../models/association"
 import {Request, Response} from "express"
 import statusCodes from "http-status-codes"
+import Test from "supertest/lib/test"
 
 const createNewServiceTemplate = async(req : Request, res : Response)=> {
         if(!req.body) {
@@ -196,6 +197,34 @@ const removeProperty =  async (req :Request, res : Response)=> {
     })
 }
 }
-  export {createNewServiceTemplate, removeProperty, changePrice, addNewProperty}
+
+const getAllServices = async(req:Request, res : Response)=> {
+
+    try {
+        const _AllServices = await ServiceTemplate.findAll({
+            include : [{
+                model : TestParameterTemplate, 
+                as : "serviceTemplateId"
+            }]
+        })
+
+        if(_AllServices.length < 1) {
+            res.status(statusCodes.NOT_FOUND).json({
+                msg : `no service found`
+            })
+            return 
+        }
+
+        res.status(statusCodes.OK).json({
+            _AllServices
+        })
+    }catch(error) {
+        res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            msg :`INTERNAL_SERVER_ERROR`, 
+            error
+        })
+    }
+}
+  export {createNewServiceTemplate, removeProperty, changePrice,getAllServices, addNewProperty}
 
 
