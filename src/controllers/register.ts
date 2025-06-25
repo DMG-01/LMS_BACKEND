@@ -58,14 +58,14 @@ const RegisterAPatient  = async (req: Request, res: Response) => {
 
       // Step 5: Copy parameters from template
       const templateParams = await TestParameterTemplate.findAll({
-        where: { testServiceId: template.id }
+        where: { serviceTemplateId: template.id }
       });
 
       const newParams = templateParams.map(param => ({
         name: param.name,
         unit: param.unit,
         referenceValue: param.referenceValue,
-        testServiceId: newService.id
+        serviceTemplateId: newService.id
       }));
 
       await TestParameter.bulkCreate(newParams, { transaction });

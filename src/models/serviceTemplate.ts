@@ -16,7 +16,7 @@ class serviceTemplate extends Model <InferAttributes<serviceTemplate>, InferCrea
     declare id :  CreationOptional<number>
     declare name : string
     declare price : number 
-    declare serviceTemplateId : number
+   // declare serviceTemplateId : number
 
 
     public async changePrice(newPrice : number) {
@@ -33,7 +33,7 @@ class serviceTemplate extends Model <InferAttributes<serviceTemplate>, InferCrea
 
     const isPropertyAvailable = await TestParameterTemplate.findOne({
         where : {
-            testServiceId : this.id, 
+            serviceTemplateId : this.id, 
             name : propertyName, 
             unit : propertyUnit, 
             referenceValue : referenceValue
@@ -51,12 +51,12 @@ class serviceTemplate extends Model <InferAttributes<serviceTemplate>, InferCrea
         name : propertyName, 
         unit : propertyUnit, 
         referenceValue : referenceValue, 
-        testServiceId : this.id
+        serviceTemplateId : this.id
     })
 
     if(newProperty) {
         return {
-            success :1, 
+            status :1, 
             newProperty
         }
     }
@@ -69,7 +69,7 @@ class serviceTemplate extends Model <InferAttributes<serviceTemplate>, InferCrea
         const propertyToRemove = await TestParameterTemplate.findOne({
             where : {
                 id : propertyId, 
-                testServiceId : this.id
+                serviceTemplateId : this.id
             }
         })
 
@@ -98,7 +98,7 @@ class serviceTemplate extends Model <InferAttributes<serviceTemplate>, InferCrea
                 id : this.id, 
                 name : this.name, 
                 price : this.name, 
-                serviceTemplateId : this.serviceTemplateId
+                //serviceTemplateId : this.serviceTemplateId
             }, 
             include : [{
                 model : TestParameterTemplate, 
@@ -122,11 +122,11 @@ serviceTemplate.init(
     price: {
       allowNull: false,
       type: DataTypes.FLOAT,
-    },
+    }/*,
     serviceTemplateId : {
         type : DataTypes.INTEGER, 
         allowNull : false, 
-    }
+    }*/
   },
   {
     sequelize,

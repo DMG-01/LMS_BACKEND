@@ -7,7 +7,7 @@ class testParameterTemplate extends Model<InferAttributes<testParameterTemplate>
     declare name : string;
     declare unit : string;
     declare referenceValue : string;
-    declare testServiceId : number 
+    declare serviceTemplateId : number 
     
 }
 
@@ -31,7 +31,7 @@ testParameterTemplate.init({
         allowNull : true,
         defaultValue : "none"
     }, 
-    testServiceId : {
+    serviceTemplateId : {
         type : DataTypes.INTEGER, 
         allowNull : false
     }

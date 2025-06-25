@@ -18,67 +18,6 @@ class Service extends Model<
   declare price: number;
   declare testVisitId: number;
   declare serviceTemplateId: number; // ✅ This is the missing field
-
-  public async addnewProperties(propertyName: string, refValue: string, propertyUnit?: any) {
-    let availableProp = await TestParameter.findOne({
-      where: {
-        testServiceId: this.id,
-        name: propertyName,
-      },
-    });
-
-    if (!availableProp) {
-      availableProp = await TestParameter.create({
-        testServiceId: this.id,
-        name: propertyName,
-        unit: propertyUnit,
-        referenceValue: refValue,
-      });
-
-      return availableProp;
-    } else {
-      throw new Error("Property already exists");
-    }
-  }
-
-  public async removeProperty(propertyId: number) {
-    const propToDelete = await TestParameter.findOne({
-      where: {
-        id: propertyId,
-      },
-    });
-
-    if (propToDelete) {
-      await propToDelete.destroy();
-      return "Property deleted";
-    } else {
-      throw new Error(`Property with id ${propertyId} not found`);
-    }
-  }
-
-  public async getServiceDetail() {
-    const serviceDetail = await Service.findOne({
-      where: {
-        id: this.id,
-      },
-      include: [
-        {
-          model: TestParameter,
-          as: "parameters",
-          attributes: ["name", "unit", "referenceValue"],
-        },
-      ],
-      attributes: ["name", "price"],
-    });
-
-    return serviceDetail;
-  }
-
-  public async changePricing(newPrice: number): Promise<number> {
-    this.price = newPrice;
-    await this.save();
-    return 1;
-  }
 }
 
 Service.init(
