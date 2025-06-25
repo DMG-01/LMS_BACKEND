@@ -7,14 +7,7 @@ import {
 } from "sequelize";
 
 import sequelize from "../connectDb";
-import { ref } from "process";
 import TestParameter from "./testParamaeters";
-
-
-interface Result {
-  propertyValue: string;
-  refValue: string;
-}
 
 class Service extends Model<
   InferAttributes<Service>,
@@ -23,71 +16,68 @@ class Service extends Model<
   declare id: CreationOptional<number>;
   declare name: string;
   declare price: number;
+  declare testVisitId: number;
+  declare serviceTemplateId: number; // ✅ This is the missing field
 
-  public  async addnewProperties(propertyName : string, refValue : string, propertyUnit? : any) {
+  public async addnewProperties(propertyName: string, refValue: string, propertyUnit?: any) {
+    let availableProp = await TestParameter.findOne({
+      where: {
+        testServiceId: this.id,
+        name: propertyName,
+      },
+    });
 
-     let availableProp
-
-     availableProp = await TestParameter.findOne({
-      where : {
-        serviceId : this.id, 
-        name : propertyName
-      }
-    })
-
-    if(!availableProp) {
+    if (!availableProp) {
       availableProp = await TestParameter.create({
-        serviceId : this.id, 
-        name : propertyName, 
-        unit : propertyUnit, 
-        referenceValue : refValue, 
-      })
+        testServiceId: this.id,
+        name: propertyName,
+        unit: propertyUnit,
+        referenceValue: refValue,
+      });
 
-      return availableProp
+      return availableProp;
     } else {
-      throw new Error("property already exist")
+      throw new Error("Property already exists");
     }
-
-    
-
   }
 
-  public async removeProperty(propertyId : number) {
-
+  public async removeProperty(propertyId: number) {
     const propToDelete = await TestParameter.findOne({
-      where : {
-        id : propertyId
-      }
-    })
-    if(propToDelete) {
-    await propToDelete?.destroy()
-    return "propery deleted"
-  }else {
-    throw new Error(`property of id ${propertyId} not found `)
+      where: {
+        id: propertyId,
+      },
+    });
+
+    if (propToDelete) {
+      await propToDelete.destroy();
+      return "Property deleted";
+    } else {
+      throw new Error(`Property with id ${propertyId} not found`);
+    }
   }
-}
 
   public async getServiceDetail() {
-
     const serviceDetail = await Service.findOne({
-      where : {
-        id : this.id
-      }, 
-      include : [{
-        model : TestParameter, 
-        as : "parameters", 
-        attributes : ["name", "unit", "referenceValue"]
-      }], 
-      attributes: ["name", "price",]
-    })
-    return serviceDetail
+      where: {
+        id: this.id,
+      },
+      include: [
+        {
+          model: TestParameter,
+          as: "parameters",
+          attributes: ["name", "unit", "referenceValue"],
+        },
+      ],
+      attributes: ["name", "price"],
+    });
 
+    return serviceDetail;
   }
 
-  public async changePricing(newPrice : number) : Promise<number> {
-    this.price = newPrice
-    await this.save()
-    return 1
+  public async changePricing(newPrice: number): Promise<number> {
+    this.price = newPrice;
+    await this.save();
+    return 1;
   }
 }
 
@@ -106,6 +96,14 @@ Service.init(
     price: {
       allowNull: false,
       type: DataTypes.FLOAT,
+    },
+    testVisitId: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+    },
+    serviceTemplateId: {
+      allowNull: false,
+      type: DataTypes.INTEGER, // ✅ Added to match controller logic
     },
   },
   {

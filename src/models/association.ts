@@ -1,10 +1,13 @@
 import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
+
 import Patient from "./patient";
 import Service from "./service";
-import patientTestTable from "./patientTestTable";
+import patientTestTable from "./patientTestTable"; // aka TestVisit
 import TestParameter from "./testParamaeters";
 import TestResult from "./testResult";
+import TestParameterTemplate from "./testParameterTemplate";
+import ServiceTemplate from "./serviceTemplate";
 
 dotenv.config();
 
@@ -18,16 +21,49 @@ const sequelize = new Sequelize(
   }
 );
 
+// PATIENT -> TEST VISIT
 Patient.hasMany(patientTestTable, { foreignKey: "patientId", as: "tests" });
 patientTestTable.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
 
+// TEST VISIT -> SERVICES
 patientTestTable.hasMany(Service, { foreignKey: "testVisitId", as: "services" });
 Service.belongsTo(patientTestTable, { foreignKey: "testVisitId", as: "visit" });
-//test table should be linked to result 
+
+// SERVICE -> PARAMETERS
 Service.hasMany(TestParameter, { foreignKey: "serviceId", as: "parameters" });
 TestParameter.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
 
+// PARAMETER -> RESULT
 TestParameter.hasMany(TestResult, { foreignKey: "parameterId", as: "results" });
 TestResult.belongsTo(TestParameter, { foreignKey: "parameterId", as: "parameter" });
 
-export { Patient, Service,patientTestTable, TestParameter, TestResult, sequelize };
+// SERVICE TEMPLATE -> PARAMETER TEMPLATE
+ServiceTemplate.hasMany(TestParameterTemplate, {
+  foreignKey: "serviceTemplateId",
+  as: "testParameters",
+});
+TestParameterTemplate.belongsTo(ServiceTemplate, {
+  foreignKey: "serviceTemplateId",
+  as: "testService",
+});
+
+// SERVICE TEMPLATE → SERVICE INSTANCE
+ServiceTemplate.hasMany(Service, {
+  foreignKey: "testServiceId",
+  as: "serviceInstances",
+});
+Service.belongsTo(ServiceTemplate, {
+  foreignKey: "testServiceId",
+  as: "template",
+});
+
+export {
+  Patient,
+  Service,
+  patientTestTable,
+  TestParameter,
+  TestResult,
+  ServiceTemplate,
+  TestParameterTemplate,
+  sequelize,
+};

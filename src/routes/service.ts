@@ -1,5 +1,5 @@
-import express, {RequestHandler} from "express";
-import {createService,removePropertyToService, changeServicePrice, returnServiceDetail, getAllService, addNewPropertyToService} from "../controllers/service";
+/*import express, {RequestHandler} from "express";
+import {createService,removePropertyToService, changeServicePrice, returnServiceDetail, getAllService, addNewPropertyToService} from "../controllers/serviceTemplate";
 import { wrap } from "module";
 
 const serviceRouter = express.Router();
@@ -20,3 +20,4 @@ serviceRouter.patch("/service/addProperty", wrapMiddleware(addNewPropertyToServi
 
 
 export default serviceRouter;
+*/

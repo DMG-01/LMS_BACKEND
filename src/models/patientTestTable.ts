@@ -7,7 +7,10 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
     declare patientId : number
     declare testId : number
     declare status : string
-    declare dateTaken : DateOnlyDataType
+    declare dateTaken : string
+
+
+    public getResult() {}
 }
 PatientTest.init({
 
