@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import statusCodes from "http-status-codes"
+import statusCodes from "http-status-codes";
 import {
   Patient,
   Service,
@@ -8,21 +8,21 @@ import {
   TestParameterTemplate,
   ServiceTemplate,
   sequelize,
-  patientTestTable,
-  TestResult
+  TestResult,
+  
 } from "../models/association";
 
 interface PatientData {
-    firstName : string, 
-    lastName : string, 
-    phoneNumber : string , 
-    email?: string , 
-    dateOfBirth?: string
-    amountPaid : number
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email?: string;
+  dateOfBirth?: string;
+  amountPaid: number;
 }
 
-const RegisterAPatient  = async (req: Request, res: Response) => {
-  const { patientData, selectedTemplateIds } : {patientData : PatientData, selectedTemplateIds : number[]} = req.body;
+const RegisterAPatient = async (req: Request, res: Response) => {
+  const { patientData, selectedTemplateIds }: { patientData: PatientData; selectedTemplateIds: number[] } = req.body;
 
   if (!patientData || !Array.isArray(selectedTemplateIds) || selectedTemplateIds.length === 0) {
     return res.status(400).json({ message: "Invalid input. Please provide patient info and service IDs." });
@@ -39,7 +39,8 @@ const RegisterAPatient  = async (req: Request, res: Response) => {
 
     // Step 2: Get valid service templates
     const validTemplates = await ServiceTemplate.findAll({
-      where: { id: selectedTemplateIds }
+      where: { id: selectedTemplateIds },
+      transaction,
     });
 
     if (validTemplates.length === 0) {
@@ -50,38 +51,52 @@ const RegisterAPatient  = async (req: Request, res: Response) => {
     // Step 3: Create a new test visit
     const today = new Date().toISOString().split("T")[0];
 
-    const testVisit = await TestVisit.create({
-      patientId: patient.id,
-      dateTaken: today,
-      status: "uncompleted",
-      amountPaid : patientData.amountPaid,
-    }, { transaction });
+    const testVisit = await TestVisit.create(
+      {
+        patientId: patient.id,
+        dateTaken: today,
+        status: "uncompleted",
+        amountPaid: patientData.amountPaid,
+      },
+      { transaction }
+    );
 
     // Step 4: Create services & copy their parameters
     const allServices = [];
 
     for (const template of validTemplates) {
-      const newService = await Service.create({
-        testVisitId: testVisit.id,
-        serviceTemplateId: template.id,
-        name: template.name,
-        price: template.price
-      }, { transaction });
+      const newService = await Service.create(
+        {
+          testVisitId: testVisit.id,
+          serviceTemplateId: template.id,
+          name: template.name,
+          price: template.price,
+        },
+        { transaction }
+      );
 
-      // Step 5: Copy parameters from template
-      const templateParams = await TestParameterTemplate.findAll({
-        where: { serviceTemplateId: template.id }
+      // Check if parameters already exist for this service
+      const existingParams = await TestParameter.findAll({
+        where: {serviceTemplateId : newService.id },
+        transaction,
       });
 
-      const newParams = templateParams.map(param => ({
-        name: param.name,
-        unit: param.unit,
-        referenceValue: param.referenceValue,
-        serviceTemplateId: template.id, 
-        serviceId : newService.id
-      }));
+      if (existingParams.length === 0) {
+        const templateParams = await TestParameterTemplate.findAll({
+          where: { serviceTemplateId: template.id },
+          transaction,
+        });
 
-      await TestParameter.bulkCreate(newParams, { transaction });
+        const newParams = templateParams.map((param) => ({
+          name: param.name,
+          unit: param.unit,
+          referenceValue: param.referenceValue,
+          serviceTemplateId: template.id,
+          serviceId: newService.id,
+        }));
+
+        await TestParameter.bulkCreate(newParams, { transaction });
+      }
 
       allServices.push(newService);
     }
@@ -93,25 +108,23 @@ const RegisterAPatient  = async (req: Request, res: Response) => {
       message: "Test visit created successfully.",
       patientId: patient.id,
       testVisitId: testVisit.id,
-      servicesCreated: allServices.length
+      servicesCreated: allServices.length,
     });
-
   } catch (error: any) {
     await transaction.rollback();
     console.error("Registration failed:", error);
     return res.status(500).json({
       message: "An error occurred while registering test.",
-      error: error.message
+      error: error.message,
     });
   }
 };
-
 
 const returnARegisterDetail = async(req : Request, res : Response) => {
 
   try {
     
-     const _register = await patientTestTable.findOne({
+     const _register = await TestVisit.findOne({
             where : {
                 id : req.params.registerId
             }, 
