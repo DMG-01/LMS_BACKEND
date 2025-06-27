@@ -10,7 +10,8 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
     declare dateTaken : string
     declare amountPaid : number
 
-
+//function to remove a service from a table
+//function to modify the amount paid
 
 }
 PatientTest.init({

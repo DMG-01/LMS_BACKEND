@@ -11,6 +11,7 @@ import {
   TestResult,
   
 } from "../models/association";
+import serviceTemplate from "../models/serviceTemplate";
 
 interface PatientData {
   firstName: string;
@@ -21,104 +22,99 @@ interface PatientData {
   amountPaid: number;
 }
 
-const RegisterAPatient = async (req: Request, res: Response) => {
-  const { patientData, selectedTemplateIds }: { patientData: PatientData; selectedTemplateIds: number[] } = req.body;
 
-  if (!patientData || !Array.isArray(selectedTemplateIds) || selectedTemplateIds.length === 0) {
-    return res.status(400).json({ message: "Invalid input. Please provide patient info and service IDs." });
+//register a patient ,check if they exist and create a profile for them if they dont
+//check if the services parsed in the array are valid 
+//if they are valid  create a register 
+//loop through and link the registerid to the services 
+
+const RegisterAPatient = async(req:Request, res : Response) => {
+
+  if (!req.body) {
+    res.status(statusCodes.BAD_REQUEST).json({msg : `missing required parameter`})
+    return
+  }
+  const {patientData, selectedTemplateIds} : {patientData : PatientData; selectedTemplateIds : number[]} = req.body
+
+  if(!patientData||!selectedTemplateIds) {
+    res.status(statusCodes.BAD_REQUEST).json({
+      msg : `missing required parameter`
+    })
+    return 
+  }
+  let _patient
+
+  _patient = await Patient.findOne({
+    where : {
+      phoneNumber : patientData.phoneNumber, 
+      firstName : patientData.firstName, 
+      lastName : patientData.lastName
+    }
+  })
+
+  if(!_patient) {
+      _patient = await Patient.create({
+        firstName : patientData.firstName, 
+        lastName : patientData.lastName, 
+        phoneNumber : patientData.phoneNumber, 
+        email : patientData.email, 
+        dateOfBirth : patientData.dateOfBirth,
+      })
+      console.log(`new patient created`)
   }
 
-  const transaction = await sequelize.transaction();
+  let register = await  TestVisit.create({
+    patientId : _patient.id,
+    status : "uncompleted", 
+    amountPaid : patientData.amountPaid, 
+    dateTaken : new Date().toISOString().split("T")[0]
+  })
 
-  try {
-    // Step 1: Check or create patient
-    let patient = await Patient.findOne({ where: { phoneNumber: patientData.phoneNumber } });
-    if (!patient) {
-      patient = await Patient.create(patientData, { transaction });
-    }
+  if(register) {
 
-    // Step 2: Get valid service templates
-    const validTemplates = await ServiceTemplate.findAll({
-      where: { id: selectedTemplateIds },
-      transaction,
-    });
-
-    if (validTemplates.length === 0) {
-      await transaction.rollback();
-      return res.status(404).json({ message: "No valid services found." });
-    }
-
-    // Step 3: Create a new test visit
-    const today = new Date().toISOString().split("T")[0];
-
-    const testVisit = await TestVisit.create(
-      {
-        patientId: patient.id,
-        dateTaken: today,
-        status: "uncompleted",
-        amountPaid: patientData.amountPaid,
-      },
-      { transaction }
-    );
-
-    // Step 4: Create services & copy their parameters
-    const allServices = [];
-
-    for (const template of validTemplates) {
-      const newService = await Service.create(
-        {
-          testVisitId: testVisit.id,
-          serviceTemplateId: template.id,
-          name: template.name,
-          price: template.price,
-        },
-        { transaction }
-      );
-
-      // Check if parameters already exist for this service
-      const existingParams = await TestParameter.findAll({
-        where: {serviceTemplateId : newService.id },
-        transaction,
-      });
-
-      if (existingParams.length === 0) {
-        const templateParams = await TestParameterTemplate.findAll({
-          where: { serviceTemplateId: template.id },
-          transaction,
-        });
-
-        const newParams = templateParams.map((param) => ({
-          name: param.name,
-          unit: param.unit,
-          referenceValue: param.referenceValue,
-          serviceTemplateId: template.id,
-          serviceId: newService.id,
-        }));
-
-        await TestParameter.bulkCreate(newParams, { transaction });
+  for(let i = 0; i < selectedTemplateIds.length; i++) {
+    const isServiceValid = await serviceTemplate.findOne({
+      where : {
+        id : selectedTemplateIds[i]
       }
+    })
 
-      allServices.push(newService);
+    if(isServiceValid) {
+      await Service.create({
+        name : isServiceValid.name, 
+        price : isServiceValid.price, 
+        testVisitId : register.id, 
+        serviceTemplateId : isServiceValid.id
+      })
+    }
+    else {
+      continue
     }
 
-    // Step 6: Commit transaction
-    await transaction.commit();
 
-    return res.status(201).json({
-      message: "Test visit created successfully.",
-      patientId: patient.id,
-      testVisitId: testVisit.id,
-      servicesCreated: allServices.length,
-    });
-  } catch (error: any) {
-    await transaction.rollback();
-    console.error("Registration failed:", error);
-    return res.status(500).json({
-      message: "An error occurred while registering test.",
-      error: error.message,
-    });
   }
-};
+
+  res.status(statusCodes.CREATED).json({
+    msg : `patient added to register successfully`, 
+    register : await TestVisit.findOne({
+      where : {
+        id : register.id
+      }, 
+      include : [{
+        model : Service, 
+        as : "services"
+      }]
+    })
+  })
+
+
+} else {
+  res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+    msg : ` an error occured while creating register`
+  })
+}
+  
+}
 
 const returnARegisterDetail = async(req : Request, res : Response) => {
 
