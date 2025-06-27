@@ -1,6 +1,6 @@
 import {DataType,Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize, DateOnlyDataType, CreationOptional} from "sequelize"
 import sequelize from "../connectDb"
-import {patientTestTable as TestVisit,Service, TestParameter, TestResult, } from "./association"
+import {patientTestTable as TestVisit,Service, TestParameter, TestResult,ServiceTemplate } from "./association"
 
 
 class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttributes<PatientTest>> {
@@ -51,7 +51,7 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
     }
 
 
-    public async changeAmountPaid(newAmountPaid : number) {
+public async changeAmountPaid(newAmountPaid : number) {
          this.amountPaid = newAmountPaid
          await this.save()
          return {
@@ -61,7 +61,59 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
     }
 
 //function to remove a service from a table
-//function to modify the amount paid
+
+public  async removeService(serviceId : number){
+    const serviceToRemove =await  Service.findOne({
+        where : {
+            id : serviceId, 
+            testVisitId : this.id
+        }
+    })
+
+    if(!serviceToRemove) {
+        return {
+            status : 0,
+            msg : `no service of ${serviceId} EXIST in this register `
+        }
+    }
+
+    await serviceToRemove.destroy()
+    await this.save()
+
+    return {
+        status : 1, 
+        msg : ` service with id ${serviceId} successfully removed from register number ${this.id}`
+    }
+}
+
+public async addService(serviceId : number ) {
+
+    const isServiceIdValid = await ServiceTemplate.findOne({
+        where : {
+            id : serviceId
+        }
+    })
+
+    if(!isServiceIdValid) {
+        return {
+            success : false, 
+            msg : `${serviceId} is an invalid service id`
+        }
+    }
+
+    const serviceToAdd = await Service.create({
+        name : isServiceIdValid.name, 
+        price : isServiceIdValid.price, 
+        testVisitId : this.id, 
+        serviceTemplateId : isServiceIdValid.id
+    })
+
+    return {
+        success : 1, 
+        msg :`service of id ${serviceId} added successfully `,
+        serviceToAdd
+    }
+}
 
 }
 PatientTest.init({

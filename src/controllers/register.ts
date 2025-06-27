@@ -190,4 +190,55 @@ const changeARegisterPrice = async(req : Request, res : Response)=> {
   
 }
 
-export {RegisterAPatient,changeARegisterPrice, returnARegisterDetail}
+const removeServiceFromRegisterRow = async(req:Request, res : Response)=> {
+  if(!req.body) {
+    res.status(statusCodes.BAD_REQUEST).json({
+      msg : `missing request body`
+    })
+    return
+  }
+
+    const {serviceIdToRemove} =  req.body
+try {
+    if(!serviceIdToRemove) {
+      res.status(statusCodes.BAD_REQUEST).json({
+        msg : `missing required parameter`
+      })
+      return
+    }
+
+    const _registerRow = await TestVisit.findOne({
+      where : {
+        id : req.params.registerId
+      }
+    })
+
+    if(!_registerRow) {
+      res.status(statusCodes.NOT_FOUND).json({
+        msg :`no row of id ${req.params.registerId}`
+      })
+      return
+    }
+
+    const response = await _registerRow.removeService(serviceIdToRemove)
+
+    if(response.status === 0) {
+      res.status(statusCodes.NOT_FOUND).json({msg : response.msg})
+      return
+    }
+
+    if(response.status === 1) {
+      res.status(statusCodes.OK).json({
+        msg : response.msg
+      })
+      return
+    }
+  }catch(error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      error 
+    })
+  }
+  }
+
+
+export {RegisterAPatient,removeServiceFromRegisterRow, changeARegisterPrice, returnARegisterDetail}
