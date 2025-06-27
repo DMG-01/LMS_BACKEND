@@ -234,9 +234,11 @@ try {
       return
     }
   }catch(error) {
+    console.log(error)
     res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
       error 
     })
+    return
   }
   }
 

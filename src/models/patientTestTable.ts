@@ -101,12 +101,27 @@ public async addService(serviceId : number ) {
         }
     }
 
-    const serviceToAdd = await Service.create({
+    const serviceExist = await Service.findOne({
+        where : {
+            testVisitId : this.id, 
+            serviceTemplateId : isServiceIdValid.id
+        }
+    })
+
+    let serviceToAdd
+        if(!serviceExist) {
+     serviceToAdd = await Service.create({
         name : isServiceIdValid.name, 
         price : isServiceIdValid.price, 
         testVisitId : this.id, 
         serviceTemplateId : isServiceIdValid.id
     })
+}else {
+    return {
+        status : 0,
+        msg : `serivice of id ${serviceId} already exist`
+    }
+}
 
     return {
         status : 1, 
