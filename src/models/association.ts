@@ -47,13 +47,13 @@ TestParameterTemplate.belongsTo(ServiceTemplate, {
   as: "testService",
 });
 
-// SERVICE TEMPLATE → SERVICE INSTANCE
+// SERVICE TEMPLATE → SERVICE INSTANCE (FIXED)
 ServiceTemplate.hasMany(Service, {
-  foreignKey: "testServiceId",
+  foreignKey: "serviceTemplateId", // ✅ Corrected from testServiceId
   as: "serviceInstances",
 });
 Service.belongsTo(ServiceTemplate, {
-  foreignKey: "testServiceId",
+  foreignKey: "serviceTemplateId", // ✅ Corrected from testServiceId
   as: "template",
 });
 

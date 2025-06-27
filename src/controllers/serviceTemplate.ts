@@ -204,7 +204,7 @@ const getAllServices = async(req:Request, res : Response)=> {
         const _AllServices = await ServiceTemplate.findAll({
             include : [{
                 model : TestParameterTemplate, 
-                as : "serviceTemplateId"
+                as : "testParameters"
             }]
         })
 
@@ -219,6 +219,7 @@ const getAllServices = async(req:Request, res : Response)=> {
             _AllServices
         })
     }catch(error) {
+        console.log(error)
         res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
             msg :`INTERNAL_SERVER_ERROR`, 
             error
@@ -236,7 +237,7 @@ const returnAService = async(req : Request, res : Response)=> {
         }, 
         include : [{
             model :TestParameterTemplate,
-            as : "serviceTemplateId"
+            as : "testParameters"
         }]
     })
 
