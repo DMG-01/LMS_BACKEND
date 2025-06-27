@@ -1,6 +1,6 @@
 import {DataType,Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize, DateOnlyDataType, CreationOptional} from "sequelize"
 import sequelize from "../connectDb"
-import {patientTestTable,Service, TestParameter, TestResult} from "./association"
+import {patientTestTable as TestVisit,Service, TestParameter, TestResult, } from "./association"
 
 
 class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttributes<PatientTest>> {
@@ -9,6 +9,56 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
     declare status : string
     declare dateTaken : string
     declare amountPaid : number
+
+
+    public async getRegisterDetail() {
+          try {
+    
+     const _register = await TestVisit.findOne({
+            where : {
+                id : this.id
+            }, 
+            include : [{
+                model : Service, 
+                as : "services", 
+                include : [{
+                    model :TestParameter,  
+                    as : "parameters", 
+                    include : [{
+                        model : TestResult, 
+                        as : "results"
+                    }]
+                }]
+            }]
+        })
+
+        if(_register) {
+            return {
+                status : 1,
+                register : _register
+            }
+        }
+
+  }catch(error) {
+    console.log(error)
+    return {
+        status :0, 
+        error : error
+    }
+    
+  }
+  
+    }
+
+
+    public async changeAmountPaid(newAmountPaid : number) {
+         this.amountPaid = newAmountPaid
+         await this.save()
+         return {
+            success : 1, 
+            msg :`amount has been changed to ${newAmountPaid}`
+         }
+    }
 
 //function to remove a service from a table
 //function to modify the amount paid

@@ -22,12 +22,6 @@ interface PatientData {
   amountPaid: number;
 }
 
-
-//register a patient ,check if they exist and create a profile for them if they dont
-//check if the services parsed in the array are valid 
-//if they are valid  create a register 
-//loop through and link the registerid to the services 
-
 const RegisterAPatient = async(req:Request, res : Response) => {
 
   if (!req.body) {
@@ -117,47 +111,83 @@ const RegisterAPatient = async(req:Request, res : Response) => {
 }
 
 const returnARegisterDetail = async(req : Request, res : Response) => {
-
-  try {
     
-     const _register = await TestVisit.findOne({
-            where : {
-                id : req.params.registerId
-            }, 
-            include : [{
-                model : Service, 
-                as : "services", 
-                include : [{
-                    model :TestParameter,  
-                    as : "parameters", 
-                    include : [{
-                        model : TestResult, 
-                        as : "results"
-                    }]
-                }]
-            }]
-        })
-
-         if(!_register) {
-                    res.status(statusCodes.NOT_FOUND).json({
-                        response :`${req.params.registerId} does not exist`
-                    })
-                    return
-                }
-        
-                else {
-                    res.status(statusCodes.OK).json({
-                        register : _register
-                    })
-                }
-
-  }catch(error) {
-    console.log(error)
-    res.status(statusCodes.BAD_REQUEST).json({
-      msg :"INTERNAL_SERVER_ERROR"
+  try {
+  const _register = await TestVisit.findOne({
+    where : {
+      id : req.params.registerId
+    }
+  })
+  if(!_register) {
+    res.status(statusCodes.NOT_FOUND).json({
+      msg :`no testVist with id ${req.params.registerId} found`
+    })
+    return
+  }
+  const response = await _register.getRegisterDetail()
+  if(response!.status === 1) {
+    res.status(statusCodes.OK).json({
+      msg :`detail of register of id ${req.params.registerId} found`, 
+      register : response!.register
+    })
+  }  
+  else {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      error :response?.error
+    })
+  }}
+  catch(error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      msg : `INTERNAL_SERVER-ERROR`, 
+      error
     })
   }
-  return
 }
 
-export {RegisterAPatient, returnARegisterDetail}
+
+const changeARegisterPrice = async(req : Request, res : Response)=> {
+  if(!req.body) {
+    res.status(statusCodes.BAD_REQUEST).json({
+      msg :`missing request body`
+    })
+    return
+  }
+
+
+  const {newPrice} = req.body 
+
+  if(!newPrice) {
+    res.status(statusCodes.BAD_REQUEST).json({
+      msg : `missing required parameter `
+    })
+  }
+
+  try {
+    const _registerToChange = await TestVisit.findOne({
+    where : {
+      id : req.params.registerId
+    }
+  })
+
+  if(!_registerToChange) {
+    res.status(statusCodes.NOT_FOUND).json({
+      msg : `no register of id ${req.params.registerId} found`
+    })
+    return
+  }
+
+  const response = await _registerToChange.changeAmountPaid(newPrice)
+  res.status(statusCodes.OK).json({
+    msg : response!.msg
+  })
+  return 
+    
+  }catch(error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      error
+    })
+  }
+  
+}
+
+export {RegisterAPatient,changeARegisterPrice, returnARegisterDetail}

@@ -1,5 +1,5 @@
 import express, {Request, Response, RequestHandler} from "express"
-import { RegisterAPatient, returnARegisterDetail } from "../controllers/register"
+import { RegisterAPatient,changeARegisterPrice, returnARegisterDetail } from "../controllers/register"
 import statusCodes from "http-status-codes"
 
 const registerRouter = express.Router()
@@ -11,4 +11,5 @@ const wrapMiddleware = (fn: Function): RequestHandler => {
 
 registerRouter.post("/register", wrapMiddleware(RegisterAPatient))
 registerRouter.get("/register/:registerId", returnARegisterDetail)
+registerRouter.patch("/register/changeAmountPaid/:registerId", changeARegisterPrice)
 export default registerRouter
