@@ -240,5 +240,60 @@ try {
   }
   }
 
+  const addServiceToRegister = async (req:Request, res : Response) => {
 
-export {RegisterAPatient,removeServiceFromRegisterRow, changeARegisterPrice, returnARegisterDetail}
+    if(!req.body) {
+    res.status(statusCodes.BAD_REQUEST).json({
+      msg : `missing request body`
+    })
+    return
+  }
+
+    const {serviceIdToAdd} =  req.body
+try {
+    if(!serviceIdToAdd) {
+      res.status(statusCodes.BAD_REQUEST).json({
+        msg : `missing required parameter`
+      })
+      return
+    }
+
+    const _registerRow = await TestVisit.findOne({
+      where : {
+        id : req.params.registerId
+      }
+    })
+
+    if(!_registerRow) {
+      res.status(statusCodes.NOT_FOUND).json({
+        msg :`no row of id ${req.params.registerId}`
+      })
+      return
+
+    }
+
+    const response = await _registerRow.addService(serviceIdToAdd)
+
+    if(response.status === 0 ) {
+      
+        res.status(statusCodes.BAD_REQUEST).json({
+          msg : response.msg
+        })
+      return
+    }
+
+    if(response.status === 1) {
+      res.status(statusCodes.OK).json({
+        msg: response.msg,
+        serviceIdToAdd 
+      })
+    }
+
+  }
+  catch(error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      msg : `INTERNAL_SERVER_ERROR`
+    })
+  }
+  }
+export {RegisterAPatient,addServiceToRegister, removeServiceFromRegisterRow, changeARegisterPrice, returnARegisterDetail}

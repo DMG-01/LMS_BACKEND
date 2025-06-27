@@ -96,7 +96,7 @@ public async addService(serviceId : number ) {
 
     if(!isServiceIdValid) {
         return {
-            success : false, 
+            status : 0, 
             msg : `${serviceId} is an invalid service id`
         }
     }
@@ -109,7 +109,7 @@ public async addService(serviceId : number ) {
     })
 
     return {
-        success : 1, 
+        status : 1, 
         msg :`service of id ${serviceId} added successfully `,
         serviceToAdd
     }
