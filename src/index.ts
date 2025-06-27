@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import sequelize from "./connectDb"
 import serviceRouter from "./routes/service"
 import registerRouter from "./routes/registerRoute"
-import { register } from "module";
 dotenv.config();
 
 const app = express();

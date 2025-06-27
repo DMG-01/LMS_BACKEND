@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+dotenv.config();
 import { Sequelize } from "sequelize";
 
 import Patient from "./patient";
@@ -9,12 +10,12 @@ import TestResult from "./testResult";
 import TestParameterTemplate from "./testParameterTemplate";
 import ServiceTemplate from "./serviceTemplate";
 
-dotenv.config();
+
 
 const sequelize = new Sequelize(
-  process.env.GUARD_DB_NAME!,
-  process.env.GUARD_DB_USER!,
-  process.env.GUARD_DB_PASS!,
+  process.env.DB_NAME!,
+  process.env.DB_USER!,
+  process.env.DB_PASS!,
   {
     host: "localhost",
     dialect: "mysql",

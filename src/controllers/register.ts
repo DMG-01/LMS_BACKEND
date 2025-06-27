@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import statusCodes from "http-status-codes"
 import {
   Patient,
   Service,
@@ -7,10 +8,21 @@ import {
   TestParameterTemplate,
   ServiceTemplate,
   sequelize,
+  patientTestTable,
+  TestResult
 } from "../models/association";
 
+interface PatientData {
+    firstName : string, 
+    lastName : string, 
+    phoneNumber : string , 
+    email?: string , 
+    dateOfBirth?: string
+    amountPaid : number
+}
+
 const RegisterAPatient  = async (req: Request, res: Response) => {
-  const { patientData, selectedTemplateIds } = req.body;
+  const { patientData, selectedTemplateIds } : {patientData : PatientData, selectedTemplateIds : number[]} = req.body;
 
   if (!patientData || !Array.isArray(selectedTemplateIds) || selectedTemplateIds.length === 0) {
     return res.status(400).json({ message: "Invalid input. Please provide patient info and service IDs." });
@@ -42,7 +54,7 @@ const RegisterAPatient  = async (req: Request, res: Response) => {
       patientId: patient.id,
       dateTaken: today,
       status: "uncompleted",
-      testId: validTemplates[0].id // optional: you can use the first template's ID or any other tracking value
+      amountPaid : patientData.amountPaid,
     }, { transaction });
 
     // Step 4: Create services & copy their parameters
@@ -65,7 +77,8 @@ const RegisterAPatient  = async (req: Request, res: Response) => {
         name: param.name,
         unit: param.unit,
         referenceValue: param.referenceValue,
-        serviceTemplateId: newService.id
+        serviceTemplateId: template.id, 
+        serviceId : newService.id
       }));
 
       await TestParameter.bulkCreate(newParams, { transaction });
@@ -93,4 +106,49 @@ const RegisterAPatient  = async (req: Request, res: Response) => {
   }
 };
 
-export {RegisterAPatient}
+
+const returnARegisterDetail = async(req : Request, res : Response) => {
+
+  try {
+    
+     const _register = await patientTestTable.findOne({
+            where : {
+                id : req.params.registerId
+            }, 
+            include : [{
+                model : Service, 
+                as : "services", 
+                include : [{
+                    model :TestParameter,  
+                    as : "parameters", 
+                    include : [{
+                        model : TestResult, 
+                        as : "results"
+                    }]
+                }]
+            }]
+        })
+
+         if(!_register) {
+                    res.status(statusCodes.NOT_FOUND).json({
+                        response :`${req.params.registerId} does not exist`
+                    })
+                    return
+                }
+        
+                else {
+                    res.status(statusCodes.OK).json({
+                        register : _register
+                    })
+                }
+
+  }catch(error) {
+    console.log(error)
+    res.status(statusCodes.BAD_REQUEST).json({
+      msg :"INTERNAL_SERVER_ERROR"
+    })
+  }
+  return
+}
+
+export {RegisterAPatient, returnARegisterDetail}

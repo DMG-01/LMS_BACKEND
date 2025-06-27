@@ -1,16 +1,17 @@
 import {DataType,Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize, DateOnlyDataType, CreationOptional} from "sequelize"
 import sequelize from "../connectDb"
+import {patientTestTable,Service, TestParameter, TestResult} from "./association"
 
 
 class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttributes<PatientTest>> {
     declare id: CreationOptional<number>
     declare patientId : number
-    declare testId : number
     declare status : string
     declare dateTaken : string
+    declare amountPaid : number
 
 
-    public getResult() {}
+
 }
 PatientTest.init({
 
@@ -24,13 +25,13 @@ PatientTest.init({
         type: DataTypes.INTEGER, 
         allowNull : false
     }, 
-    testId : {
-        type :DataTypes.INTEGER, 
-        allowNull : false
-    }, 
     status : {
         type : DataTypes.ENUM("completed", "uncompleted"),
         defaultValue :"uncompleted", 
+        allowNull : false
+    }, 
+    amountPaid : {
+        type : DataTypes.INTEGER, 
         allowNull : false
     }, 
     dateTaken : {
