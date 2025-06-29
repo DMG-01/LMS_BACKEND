@@ -1,9 +1,9 @@
 import {Model, InferAttributes, InferCreationAttributes,CreationOptional, DataTypes ,CreationAttributes  } from "sequelize"
 import sequelize from "../connectDb"
 import testParameterTemplate from "./testParameterTemplate";
-class TestParameterTemplate extends Model<
-  InferAttributes<TestParameterTemplate>,
-  InferCreationAttributes<TestParameterTemplate>
+class TestParameter extends Model<
+  InferAttributes<TestParameter>,
+  InferCreationAttributes<TestParameter>
 > {
   declare id: CreationOptional<number>;
   declare name: string;
@@ -12,7 +12,7 @@ class TestParameterTemplate extends Model<
   declare testServiceId: number; // ✅ MUST match init below
 }
 
-TestParameterTemplate.init({
+TestParameter.init({
   id: {
     primaryKey: true,
     allowNull: false,
@@ -43,4 +43,4 @@ TestParameterTemplate.init({
   timestamps: true,
 });
 
-export default testParameterTemplate
+export default TestParameter

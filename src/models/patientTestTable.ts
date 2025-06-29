@@ -60,7 +60,7 @@ public async changeAmountPaid(newAmountPaid : number) {
          }
     }
 
-//function to remove a service from a table
+
 
 public  async removeService(serviceId : number){
     const serviceToRemove =await  Service.findOne({

@@ -3,8 +3,8 @@ import sequelize from "../connectDb"
 import { Test } from "supertest"
 
 class TestResult extends Model<InferAttributes<TestResult>, InferCreationAttributes<TestResult>> {
-    declare id : number;
-    declare parameterTestId : number;
+    declare id : CreationOptional<number>;
+    declare serviceId : number;
     declare parameterId : number;
     declare value : string 
 }
@@ -17,7 +17,7 @@ TestResult.init({
         autoIncrement : true, 
         allowNull : false
     }, 
-    parameterTestId : {
+    serviceId : {
         type : DataTypes.INTEGER, 
         allowNull :false
     }, 

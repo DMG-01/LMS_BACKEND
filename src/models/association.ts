@@ -34,6 +34,11 @@ Service.belongsTo(patientTestTable, { foreignKey: "testVisitId", as: "visit" });
 Service.hasMany(TestParameter, { foreignKey: "serviceId", as: "parameters" });
 TestParameter.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
 
+
+// SERVICE -> RESULT 
+Service.hasOne(TestResult, { foreignKey: "serviceId", as: "testResult" });
+TestResult.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
+
 // PARAMETER -> RESULT
 TestParameter.hasMany(TestResult, { foreignKey: "parameterId", as: "results" });
 TestResult.belongsTo(TestParameter, { foreignKey: "parameterId", as: "parameter" });
