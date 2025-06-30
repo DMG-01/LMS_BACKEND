@@ -40,8 +40,8 @@ Service.hasOne(TestResult, { foreignKey: "serviceId", as: "testResult" });
 TestResult.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
 
 // PARAMETER -> RESULT
-TestParameter.hasMany(TestResult, { foreignKey: "parameterId", as: "results" });
-TestResult.belongsTo(TestParameter, { foreignKey: "parameterId", as: "parameter" });
+TestParameterTemplate.hasMany(TestResult, { foreignKey: "parameterId", as: "results" });
+TestResult.belongsTo(TestParameterTemplate, { foreignKey: "parameterId", as: "parameter" });
 
 // SERVICE TEMPLATE -> PARAMETER TEMPLATE
 ServiceTemplate.hasMany(TestParameterTemplate, {

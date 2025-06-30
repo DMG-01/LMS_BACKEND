@@ -37,7 +37,7 @@ testParameterTemplate.init({
     }
 }, {
     timestamps : true, 
-    tableName : "testParameterTemplate",
+    tableName : "testparametertemplate",
     modelName :"testParameterTemplate", 
     sequelize
 })

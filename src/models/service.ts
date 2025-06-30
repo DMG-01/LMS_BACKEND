@@ -20,45 +20,47 @@ class Service extends Model<
   declare testVisitId: number;
   declare serviceTemplateId: number; 
 
-  public async  uploadResult(value : string, parameterTemplateId : number) {
- 
-    //result should have serviceId and parameter
-    
+public async uploadResult(value: string, parameterTemplateId: number) {
+  try {
+    console.log(`checking for parameter template`);
+
     const _testParameterTemplate = await TestParameterTemplate.findOne({
-      where : {
-        serviceTemplateId : this.serviceTemplateId, 
-        id : parameterTemplateId
-      }
-      })
+      where: {
+        serviceTemplateId: this.serviceTemplateId,
+        id: parameterTemplateId,
+      },
+    });
 
-      if(!_testParameterTemplate) {
-        return {
-          status : 0, 
-          msg : `parameter template does not exist`
-        }
-      }
-
-      // so here you dont need to create a new parameter
-      /*
-    const newParameter = await TestParameter.create({
-        name : _testParameterTemplate.name, 
-        unit : _testParameterTemplate.unit, 
-        referenceValue : _testParameterTemplate.referenceValue, 
-        testServiceId : this.id
-    })
-*/
-    const _testResult = await TestResult.create({
-      serviceId : this.id, 
-      parameterId : _testParameterTemplate.id, 
-      value : value
-    })
-
-    return {
-      success : 1, 
-      _testResult 
+    if (!_testParameterTemplate) {
+      console.log(`parameter template not found`);
+      return {
+        status: 0,
+        msg: `Parameter template with ID ${parameterTemplateId} not found for service template ${this.serviceTemplateId}`,
+      };
     }
-    
+
+    console.log(`creating result`);
+    const _testResult = await TestResult.create({
+      serviceId: this.id,
+      parameterId: _testParameterTemplate.id,
+      value: value,
+    });
+
+    console.log(`result created`);
+    return {
+      success: 1,
+      _testResult,
+    };
+  } catch (err) {
+    console.error(`❌ Error in uploadResult():`, err);
+    return {
+      status: 0,
+      msg: "An unexpected error occurred while uploading the result",
+      error: err,
+    };
   }
+}
+
 }
 
 Service.init(
