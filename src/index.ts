@@ -21,10 +21,6 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, async () => {
     await sequelize.authenticate()
-    /* await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
-    sequelize.drop()
-    sequelize.sync({ force: true })
-    */
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 

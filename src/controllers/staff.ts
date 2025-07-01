@@ -1,6 +1,7 @@
 import express, {Request, Response} from "express"
 import statusCodes from "http-status-codes"
-import {patientTestTable as TestVisit, Service } from "../models/association"
+import {patientTestTable as TestVisit, Service, TestResult } from "../models/association"
+import Test from "supertest/lib/test"
 
 
 
@@ -87,8 +88,58 @@ try {
 
 
 
-const editResult = async(req:Request, res:Response)=> {}
+const editResult = async(req:Request, res:Response)=> {
 
-const getPatientHistory = async(req:Request, res :Response)=> {}
+    try {
+    if(!req.body) {
+        res.status(statusCodes.BAD_REQUEST).json({
+            msg :`MISSING REQUEST BODY`
+        })
+        return
+    }
 
-export  {uploadResult}
+    const {resultId, serviceId, newValue} = req.body
+    if(!resultId || !serviceId || !newValue) {
+        res.status(statusCodes.BAD_REQUEST).json({
+            msg : `MISSING REQUIRED PARAMETER`
+        })
+        return
+    }
+
+    const _result = await TestResult.findOne({
+        where : {
+            id : resultId, 
+            serviceId : serviceId
+        }
+    })
+
+    if(!_result) {
+         res.status(statusCodes.NOT_FOUND).json({
+            msg : `no result with corresponding id ${resultId} and serviceId ${serviceId} found`
+        })
+        return
+    }
+
+    console.log(_result.value)
+    _result.value = newValue
+   const newResult = await _result.save()
+    console.log(newResult.value)
+
+    res.status(statusCodes.OK).json({
+        msg : `change successful`
+    })
+    return
+
+}catch(error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+        msg : `INTERNAL_SERVER_ERROR`
+    })
+    return
+}
+
+
+}
+
+
+
+export  {uploadResult, editResult}
