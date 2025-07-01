@@ -1,5 +1,5 @@
 import express, {Request, Response, RequestHandler} from "express"
-import {RegisterAPatient,addServiceToRegister, removeServiceFromRegisterRow, changeARegisterPrice, returnARegisterDetail} from "../controllers/register"
+import {RegisterAPatient,returnAllRegister, addServiceToRegister, removeServiceFromRegisterRow, changeARegisterPrice, returnARegisterDetail} from "../controllers/register"
 import statusCodes from "http-status-codes"
 
 const registerRouter = express.Router()
@@ -14,4 +14,5 @@ registerRouter.get("/register/:registerId", returnARegisterDetail)
 registerRouter.patch("/register/changeAmountPaid/:registerId", changeARegisterPrice)
 registerRouter.patch("/register/addService/:registerId", addServiceToRegister)
 registerRouter.patch("/register/removeService/:registerId", removeServiceFromRegisterRow)
+registerRouter.get("/register", returnAllRegister)
 export default registerRouter

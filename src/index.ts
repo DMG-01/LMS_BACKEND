@@ -4,6 +4,7 @@ import sequelize from "./connectDb"
 import serviceRouter from "./routes/service"
 import registerRouter from "./routes/registerRoute"
 import staffsRouter from "./routes//staffs"
+import dashRouter from "./routes/dashRoutes";
 import { Sequelize } from "sequelize";
 dotenv.config();
 
@@ -13,6 +14,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(serviceRouter)
 app.use(registerRouter)
+app.use(dashRouter)
 
 app.use(staffsRouter)
 app.get("/", (req, res) => {

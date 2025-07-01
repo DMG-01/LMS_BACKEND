@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import statusCodes from "http-status-codes";
+import { Op } from "sequelize";
 import {
   Patient,
   Service,
@@ -298,4 +299,33 @@ try {
     })
   }
   }
-export {RegisterAPatient,addServiceToRegister, removeServiceFromRegisterRow, changeARegisterPrice, returnARegisterDetail}
+
+const returnAllRegister = async (req: Request, res: Response) => {
+  try {
+    const { date, patientId } = req.query; 
+    const filters: any = {};
+
+    if (date) {
+      filters.date = date;
+    }
+
+    if (patientId) {
+      filters.patientId = patientId;
+    }
+
+    const _registers = await TestVisit.findAll({
+      where: filters,
+      include: ['patient'], 
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.status(200).json({
+      data: _registers,
+      message: "Registers fetched successfully",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export {RegisterAPatient,addServiceToRegister, removeServiceFromRegisterRow, returnAllRegister, changeARegisterPrice, returnARegisterDetail}
