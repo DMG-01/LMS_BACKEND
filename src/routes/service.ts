@@ -19,4 +19,5 @@ serviceRouter.delete("/service/remove_property", removeProperty)
 serviceRouter.patch("/service/addProperty", addNewProperty)
 
 
+
 export default serviceRouter;

@@ -313,11 +313,19 @@ const returnAllRegister = async (req: Request, res: Response) => {
       filters.patientId = patientId;
     }
 
-    const _registers = await TestVisit.findAll({
-      where: filters,
-      include: ['patient'], 
-      order: [['createdAt', 'DESC']],
-    });
+const _registers = await TestVisit.findAll({
+  where: {
+    ...filters 
+  },
+  include: [
+    { model: Patient, as: "patient" },
+    { model: Service,
+      as: "services", 
+      attributes : ["name"]
+    }
+  ],
+  order: [['createdAt', 'DESC']],
+});
 
     res.status(200).json({
       data: _registers,
