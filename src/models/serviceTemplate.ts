@@ -90,6 +90,34 @@ class serviceTemplate extends Model <InferAttributes<serviceTemplate>, InferCrea
         }
     }
 
+    public async  editProperty(properties : any, propertyId : number) {
+
+      const property = await TestParameterTemplate.findOne({
+    where: {
+        id: propertyId,
+        serviceTemplateId: this.id
+    }
+});
+
+if (!property) {
+    return {
+        success: 0,
+        msg: "No matching property found"
+    };
+}
+
+Object.assign(property, properties);
+await property.save();
+
+return {
+    success: 1,
+    msg: "Property successfully updated"
+};
+
+
+        
+    }
+
 
     public async getServiceDetail() {
 

@@ -89,6 +89,49 @@ const changePrice = async(req : Request, res : Response) => {
       }
 }
 
+const editProperty = async (req : Request, res : Response)=> {
+
+    if(!req.body) {
+        res.status(statusCodes.BAD_REQUEST)
+    }
+    
+    try {
+        const _service = await ServiceTemplate.findOne({
+            where : {
+                id : req.params.serviceId
+            }
+        })
+
+        if(!_service) {
+            res.status(statusCodes.NOT_FOUND).json({
+                msg : `Service with id ${req.params.serviceId} not found`
+            })
+            return
+        }
+
+        const response = await _service.editProperty(req.body, Number(req.params.propertyId))
+
+        if(response.success === 1) {
+            res.status(statusCodes.OK).json({
+                msg : response!.msg
+            })
+        } 
+
+        else if(response.success  === 0) {
+            res.status(statusCodes.NOT_FOUND).json({
+                msg : response!.msg
+            })
+            return
+        }
+    }catch(error) {
+        console.log(error)
+        res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            msg : `INTERNAL_SERVER_ERROR`
+        })
+
+    }
+}
+
 const addNewProperty = async(req : Request, res : Response) => {
 
     if(!req.body) {
@@ -260,6 +303,6 @@ const returnAService = async(req : Request, res : Response)=> {
 }
 
 }
-  export {createNewServiceTemplate, returnAService,  removeProperty, changePrice,getAllServices, addNewProperty}
+  export {createNewServiceTemplate, returnAService,  removeProperty, changePrice,getAllServices, editProperty,  addNewProperty}
 
 
