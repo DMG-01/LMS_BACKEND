@@ -4,6 +4,7 @@ import statusCodes from "http-status-codes"
 import Test from "supertest/lib/test"
 
 const createNewServiceTemplate = async(req : Request, res : Response)=> {
+    console.log(`creating new service`)
         if(!req.body) {
             res.status(statusCodes.BAD_REQUEST).json({
                 msg : `missing required parameter`
@@ -142,7 +143,8 @@ const addNewProperty = async(req : Request, res : Response) => {
     }
 
     const {propertyName,serviceId,  propertyUnit,referenceValue} = req.body
-
+    console.log(`request seen`)
+    console.log(req.body)
     if(!propertyName  || !serviceId ||!propertyUnit || !referenceValue) {
         res.status(statusCodes.BAD_REQUEST).json ({
             msg : `missing required parameter`
@@ -188,38 +190,24 @@ const addNewProperty = async(req : Request, res : Response) => {
 
 
 const removeProperty =  async (req :Request, res : Response)=> {
-         if(!req.body) {
-        res.status(statusCodes.BAD_REQUEST).json({
-            msg : `missing req.body`
-        })
-        return
-    }
-
-    const {serviceId, propertyId} = req.body
-    if(!serviceId || !propertyId) {
-        res.status(statusCodes.BAD_REQUEST).json({
-            msg : `missing required parameter`
-        })
-        return
-    } 
 
     try {
 
     const _service = await ServiceTemplate.findOne({
         where : {
-            id : serviceId
+            id : req.params.serviceId
         }
     })
 
     if(!_service) {
         res.status(statusCodes.NOT_FOUND).json ({
-            msg : `no service with id ${serviceId} found`
+            msg : `no service with id ${ req.params.serviceId} found`
         })
         return
     }
 
 
-    const response = await _service.removeProperty(propertyId)
+    const response = await _service.removeProperty(Number(req.params.propertyId))
 
     if(response.success === 1) {
         res.status(statusCodes.OK).json({

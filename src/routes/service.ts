@@ -15,7 +15,7 @@ serviceRouter.post("/service", createNewServiceTemplate);
 serviceRouter.get("/service/:serviceId",returnAService )
 serviceRouter.get("/service", wrapMiddleware(getAllServices))
 serviceRouter.patch("/service/change_price", changePrice)
-serviceRouter.delete("/service/remove_property", removeProperty)
+serviceRouter.delete("/service/:serviceId/removeproperty/:propertyId", removeProperty)
 serviceRouter.patch("/service/addProperty", addNewProperty)
 serviceRouter.patch('/service/:serviceId/property/:propertyId', editProperty)
 
