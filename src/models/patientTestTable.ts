@@ -1,6 +1,6 @@
 import {DataType,Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize, DateOnlyDataType, CreationOptional} from "sequelize"
 import sequelize from "../connectDb"
-import {patientTestTable as TestVisit,Service, TestParameter, TestResult,ServiceTemplate, TestParameterTemplate } from "./association"
+import {patientTestTable as TestVisit,Service,Patient,TestParameter, TestResult,ServiceTemplate, TestParameterTemplate } from "./association"
 import Test from "supertest/lib/test"
 
 
@@ -19,7 +19,8 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
             where : {
                 id : this.id
             }, 
-            include : [{
+            include : [
+                {
                 model : Service, 
                 as : "services", 
                 include : [{
@@ -30,7 +31,11 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
                         as : "parameter"
                     }]
                 }]
-            }]
+            },
+             {
+                      model : Patient, 
+                      as : "patient"  
+                    }]
         })
 
         if(_register) {
