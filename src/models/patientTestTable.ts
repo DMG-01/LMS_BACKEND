@@ -31,18 +31,7 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
                         model : TestParameterTemplate, 
                         as : "parameter"
                     }]
-                }, 
-                {model :ServiceTemplate, 
-                    as : "template", 
-                    include : [{
-                        model : TestParameterTemplate, 
-                        as : "testParameters", 
-                        include : [{
-                        model : TestResult, 
-                        as : "results", 
-                        }]
-                    }]
-                 }
+                }
             ]
             },
              {
