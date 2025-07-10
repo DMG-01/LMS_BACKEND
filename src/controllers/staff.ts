@@ -15,8 +15,8 @@ const uploadResult = async (req:Request, res : Response)=> {
 
     console.log(`request body found`)
     
-    const {testVisitNumber, serviceId,parameterTemplateId,  result} : {testVisitNumber : number , serviceId : number, result : any, parameterTemplateId:number} = req.body
-    if(!testVisitNumber || !serviceId || !result || !parameterTemplateId) {
+    const {serviceId,parameterTemplateId,  result} : {testVisitNumber : number , serviceId : number, result : any, parameterTemplateId:number} = req.body
+    if( !serviceId || !result || !parameterTemplateId) {
         res.status(statusCodes.BAD_REQUEST).json({
             msg :`missing required parameter`
         })
@@ -31,8 +31,7 @@ try {
   console.log(`checking...`);
   _serviceWithRegNo = await Service.findOne({
     where: {
-      id: serviceId,
-      testVisitId: testVisitNumber
+      id: serviceId
     }
   });
   console.log("found...", _serviceWithRegNo);
@@ -54,7 +53,7 @@ try {
     if(!_serviceWithRegNo) {
         console.log(`service with reg number not found`)
         res.status(statusCodes.NOT_FOUND).json({
-            msg :`no service of id ${serviceId} included in register of id ${testVisitNumber} found`
+            msg :`no service of id ${serviceId}  found`
         })
         return
     }
