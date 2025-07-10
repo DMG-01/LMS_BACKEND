@@ -5,7 +5,6 @@ import {
   Patient,
   Service,
   patientTestTable as TestVisit,
-  TestParameter,
   TestParameterTemplate,
   ServiceTemplate,
   sequelize,

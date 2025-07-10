@@ -1,6 +1,6 @@
 import {DataType,Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize, DateOnlyDataType, CreationOptional} from "sequelize"
 import sequelize from "../connectDb"
-import {patientTestTable as TestVisit,Service,Patient,TestParameter, TestResult,ServiceTemplate, TestParameterTemplate } from "./association"
+import {patientTestTable as TestVisit,Service,Patient, TestResult,ServiceTemplate, TestParameterTemplate } from "./association"
 import Test from "supertest/lib/test"
 
 

@@ -5,7 +5,6 @@ import { Sequelize } from "sequelize";
 import Patient from "./patient";
 import Service from "./service";
 import patientTestTable from "./patientTestTable"; // aka TestVisit
-import TestParameter from "./testParamaeters";
 import TestResult from "./testResult";
 import TestParameterTemplate from "./testParameterTemplate";
 import ServiceTemplate from "./serviceTemplate";
@@ -30,9 +29,6 @@ patientTestTable.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
 patientTestTable.hasMany(Service, { foreignKey: "testVisitId", as: "services" });
 Service.belongsTo(patientTestTable, { foreignKey: "testVisitId", as: "visit" });
 
-// SERVICE -> PARAMETERS
-Service.hasMany(TestParameter, { foreignKey: "serviceId", as: "parameters" });
-TestParameter.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
 
 
 // SERVICE -> RESULT 
@@ -67,7 +63,6 @@ export {
   Patient,
   Service,
   patientTestTable,
-  TestParameter,
   TestResult,
   ServiceTemplate,
   TestParameterTemplate,
