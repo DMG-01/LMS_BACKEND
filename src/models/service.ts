@@ -40,6 +40,20 @@ public async uploadResult(value: string, parameterTemplateId: number) {
     }
 
     console.log(`creating result`);
+
+    const testResultExist = await TestResult.findOne({
+      where : {
+        serviceId : this.id, 
+        parameterId : _testParameterTemplate.id
+      }
+    })
+
+    if(testResultExist) {
+      return {
+        status : 0, 
+        msg : `A result already exist for serviceof id ${this.id} and parameter template of id ${_testParameterTemplate.id}`
+      }
+    }
     const _testResult = await TestResult.create({
       serviceId: this.id,
       parameterId: _testParameterTemplate.id,

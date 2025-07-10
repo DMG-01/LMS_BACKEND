@@ -36,6 +36,7 @@ TestResult.init({
         timestamps : true   
     })
 
-
+    ////register number --> service -->result ---> parameter 
+    // add constraint, there cannot be 2 parameters in the same service
 
 export default TestResult
