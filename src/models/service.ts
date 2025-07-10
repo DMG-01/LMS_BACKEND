@@ -7,7 +7,7 @@ import {
 } from "sequelize";
 
 import sequelize from "../connectDb";
-import { TestParameterTemplate,TestParameter, TestResult  } from "./association";
+import { TestParameterTemplate, TestResult  } from "./association";
 import Test from "supertest/lib/test";
 
 class Service extends Model<
