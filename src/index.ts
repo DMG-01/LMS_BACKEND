@@ -5,6 +5,7 @@ import serviceRouter from "./routes/service"
 import registerRouter from "./routes/registerRoute"
 import staffsRouter from "./routes//staffs"
 import dashRouter from "./routes/dashRoutes";
+import referralRouter from "./routes/referralRoute";
 import cors from "cors"
 import { Sequelize } from "sequelize";
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(cors())
 app.use(serviceRouter)
 app.use(registerRouter)
 app.use(dashRouter)
+app.use(referralRouter)
 
 app.use(staffsRouter)
 app.get("/", (req, res) => {
