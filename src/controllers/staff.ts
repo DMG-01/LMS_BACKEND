@@ -1,6 +1,7 @@
 import express, {Request, Response} from "express"
 import statusCodes from "http-status-codes"
-import {patientTestTable as TestVisit, Service, TestResult } from "../models/association"
+import {patientTestTable as TestVisit, Service, TestResult,Patient, patientTestTable, TestParameterTemplate  } from "../models/association"
+import {Op} from "sequelize"
 import Test from "supertest/lib/test"
 
 
@@ -140,6 +141,51 @@ const editResult = async(req:Request, res:Response)=> {
 
 }
 
+const patientHistory = async(req : Request, res : Response ) =>  {
+
+    try {
+            const {firstName, lastName, phoneNumber, email} = req.query
+
+            const where: any = {};
+
+    if (firstName) where.firstName = { [Op.like]: `%${firstName}%` };
+    if (lastName) where.lastName = { [Op.like]: `%${lastName}%` };
+    if (phoneNumber) where.phoneNumber = { [Op.like]: `%${phoneNumber}%` };
+    if (email) where.phoneNumber = { [Op.like]: `%${email}%` };
 
 
-export  {uploadResult, editResult}
+    const _patientHistory = await Patient.findAll({
+        where, 
+        include : [{
+            model : patientTestTable, 
+            as : "tests", 
+            include : [{
+                model : Service, 
+                as : "services", 
+                include : [{
+                    model : TestResult, 
+                    as : "testResult",
+                    include : [{
+                        model : TestParameterTemplate, 
+                        as : "parameter"
+                    }]
+                }]
+            }]
+        }]
+    })
+
+    res.status(statusCodes.OK).json({
+        _patientHistory
+    })
+    return
+    }catch(error) {
+        res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            msg : `INTERNAL_SERVER_ERROR`
+        })
+        return
+    }
+}
+
+
+
+export  {uploadResult, editResult, patientHistory}
