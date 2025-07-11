@@ -8,6 +8,8 @@ import patientTestTable from "./patientTestTable"; // aka TestVisit
 import TestResult from "./testResult";
 import TestParameterTemplate from "./testParameterTemplate";
 import ServiceTemplate from "./serviceTemplate";
+import Referral  from "./referral";
+import patient from "./patient";
 
 
 
@@ -20,6 +22,11 @@ const sequelize = new Sequelize(
     dialect: "mysql",
   }
 );
+
+//REFERRAL --> TEST VISIT
+
+Referral.hasMany(patientTestTable, {foreignKey : "referralId", as : "tests" })
+patientTestTable.belongsTo(Referral, {foreignKey :"referralId", as : "referral"})
 
 // PATIENT -> TEST VISIT
 Patient.hasMany(patientTestTable, { foreignKey: "patientId", as: "tests" });

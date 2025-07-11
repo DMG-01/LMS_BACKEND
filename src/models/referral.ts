@@ -7,6 +7,7 @@ class Referral extends Model<InferAttributes<Referral>, InferCreationAttributes<
     declare totalDiscountPayed : CreationOptional<number>
     declare accountNumber : CreationOptional<number>
     declare bankName : CreationOptional<number>
+    declare referralId : CreationOptional<number>
 }
 
 Referral.init({
@@ -38,6 +39,10 @@ Referral.init({
     bankName : {
         type : DataTypes.STRING, 
         allowNull : false
+    },
+    referralId : {
+        type : DataTypes.INTEGER, 
+        allowNull :  true
     }
 
 
@@ -47,3 +52,6 @@ Referral.init({
     tableName : "referral", 
     modelName : "referral", 
 })
+
+
+export default Referral

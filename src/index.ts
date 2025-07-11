@@ -25,6 +25,7 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, async () => {
     await sequelize.authenticate()
+   // await sequelize.sync({ alter: true })
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
