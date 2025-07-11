@@ -10,6 +10,7 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
     declare status : string
     declare dateTaken : string
     declare amountPaid : number
+   declare referralId: CreationOptional<number> | null;
 
 
     public async getRegisterDetail() {
@@ -163,6 +164,11 @@ PatientTest.init({
     dateTaken : {
         type : DataTypes.DATEONLY, 
         allowNull : false
+    }, 
+    referralId : {
+        type : DataTypes.INTEGER, 
+        allowNull : true,
+        defaultValue : 0
     }
 }, {
     sequelize, 

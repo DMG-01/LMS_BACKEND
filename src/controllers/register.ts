@@ -5,6 +5,7 @@ import {
   Patient,
   Service,
   patientTestTable as TestVisit,
+  Referral,
   TestParameterTemplate,
   ServiceTemplate,
   sequelize,
@@ -22,93 +23,103 @@ interface PatientData {
   amountPaid: number;
 }
 
-const RegisterAPatient = async(req:Request, res : Response) => {
-
+const RegisterAPatient = async (req: Request, res: Response) => {
   if (!req.body) {
-    res.status(statusCodes.BAD_REQUEST).json({msg : `missing required parameter`})
-    return
-  }
-  const {patientData, selectedTemplateIds} : {patientData : PatientData; selectedTemplateIds : number[]} = req.body
-
-  if(!patientData||!selectedTemplateIds) {
-    res.status(statusCodes.BAD_REQUEST).json({
-      msg : `missing required parameter`
-    })
-    return 
-  }
-  let _patient
-
-  _patient = await Patient.findOne({
-    where : {
-      phoneNumber : patientData.phoneNumber, 
-      firstName : patientData.firstName, 
-      lastName : patientData.lastName
-    }
-  })
-
-  if(!_patient) {
-      _patient = await Patient.create({
-        firstName : patientData.firstName, 
-        lastName : patientData.lastName, 
-        phoneNumber : patientData.phoneNumber, 
-        email : patientData.email, 
-        dateOfBirth : patientData.dateOfBirth,
-      })
-      console.log(`new patient created`)
+    return res.status(statusCodes.BAD_REQUEST).json({ msg: "missing required parameter" });
   }
 
-  let register = await  TestVisit.create({
-    patientId : _patient.id,
-    status : "uncompleted", 
-    amountPaid : patientData.amountPaid, 
-    dateTaken : new Date().toISOString().split("T")[0]
-  })
+  const {
+    patientData,
+    selectedTemplateIds,
+    referralName = null
+  }: {
+    patientData: PatientData;
+    selectedTemplateIds: number[];
+    referralName?: string | null;
+  } = req.body;
 
-  if(register) {
+  if (!patientData || !selectedTemplateIds) {
+    return res.status(statusCodes.BAD_REQUEST).json({
+      msg: "missing required parameter"
+    });
+  }
 
-  for(let i = 0; i < selectedTemplateIds.length; i++) {
-    const isServiceValid = await serviceTemplate.findOne({
-      where : {
-        id : selectedTemplateIds[i]
+  try {
+    // Find or create patient
+    let _patient = await Patient.findOne({
+      where: {
+        phoneNumber: patientData.phoneNumber,
+        firstName: patientData.firstName,
+        lastName: patientData.lastName
       }
-    })
+    });
 
-    if(isServiceValid) {
-      await Service.create({
-        name : isServiceValid.name, 
-        price : isServiceValid.price, 
-        testVisitId : register.id, 
-        serviceTemplateId : isServiceValid.id
-      })
+    if (!_patient) {
+      _patient = await Patient.create({
+        firstName: patientData.firstName,
+        lastName: patientData.lastName,
+        phoneNumber: patientData.phoneNumber,
+        email: patientData.email,
+        dateOfBirth: patientData.dateOfBirth
+      });
+      console.log("new patient created");
     }
-    else {
-      continue
+
+    // Handle referral if provided
+    let referralId: number | null = null;
+    if (referralName) {
+      let referral = await Referral.findOne({ where: { name: referralName } });
+      if (!referral) {
+        referral = await Referral.create({ name: referralName });
+      }
+      referralId = referral.id;
     }
 
+    // Create test visit
+    const register = await TestVisit.create({
+      patientId: _patient.id,
+      status: "uncompleted",
+      amountPaid: patientData.amountPaid,
+      referralId: referralId, // <-- Always included (either actual ID or null)
+      dateTaken: new Date().toISOString().split("T")[0]
+    });
 
-  }
+    // Add services
+    for (let i = 0; i < selectedTemplateIds.length; i++) {
+      const isServiceValid = await serviceTemplate.findOne({
+        where: { id: selectedTemplateIds[i] }
+      });
 
-  res.status(statusCodes.CREATED).json({
-    msg : `patient added to register successfully`, 
-    register : await TestVisit.findOne({
-      where : {
-        id : register.id
-      }, 
-      include : [{
-        model : Service, 
-        as : "services"
+      if (isServiceValid) {
+        await Service.create({
+          name: isServiceValid.name,
+          price: isServiceValid.price,
+          testVisitId: register.id,
+          serviceTemplateId: isServiceValid.id
+        });
+      }
+    }
+
+    // Final response
+    const fullRegister = await TestVisit.findOne({
+      where: { id: register.id },
+      include: [{
+        model: Service,
+        as: "services"
       }]
-    })
-  })
+    });
 
-
-} else {
-  res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
-    msg : ` an error occured while creating register`
-  })
-}
-  
-}
+    return res.status(statusCodes.CREATED).json({
+      msg: "patient added to register successfully",
+      register: fullRegister
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      msg: "an error occurred while creating register"
+    });
+  }
+};
 
 const returnARegisterDetail = async(req : Request, res : Response) => {
     

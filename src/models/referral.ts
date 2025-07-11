@@ -38,7 +38,7 @@ Referral.init({
     }, 
     bankName : {
         type : DataTypes.STRING, 
-        allowNull : false
+        allowNull : true
     },
     referralId : {
         type : DataTypes.INTEGER, 

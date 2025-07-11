@@ -9,7 +9,7 @@ import TestResult from "./testResult";
 import TestParameterTemplate from "./testParameterTemplate";
 import ServiceTemplate from "./serviceTemplate";
 import Referral  from "./referral";
-import patient from "./patient";
+
 
 
 
@@ -73,5 +73,6 @@ export {
   TestResult,
   ServiceTemplate,
   TestParameterTemplate,
+  Referral,
   sequelize,
 };
