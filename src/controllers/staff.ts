@@ -130,6 +130,7 @@ const editResult = async(req:Request, res:Response)=> {
     return
 
 }catch(error) {
+    console.log(error)
     res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
         msg : `INTERNAL_SERVER_ERROR`
     })
