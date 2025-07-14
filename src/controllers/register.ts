@@ -346,4 +346,24 @@ const _registers = await TestVisit.findAll({
   }
 };
 
-export {RegisterAPatient,addServiceToRegister, removeServiceFromRegisterRow, returnAllRegister, changeARegisterPrice, returnARegisterDetail}
+const deleteARegister = async(req : Request, res : Response)=> {
+
+  const _register = TestVisit.destroy({
+    where : {
+      id : req.params.testVisitId
+    }
+  })
+
+  if(!_register) {
+    res.status(statusCodes.NOT_FOUND).json({
+      msg : `No register with test id ${req.params.testVisitId} found`
+    })
+    return
+  }
+
+  res.status(statusCodes.OK).json({
+    msg : `testVisit with id ${req.params.testVisitId} deleted`
+  })
+  return
+}
+export {RegisterAPatient,addServiceToRegister,deleteARegister, removeServiceFromRegisterRow, returnAllRegister, changeARegisterPrice, returnARegisterDetail}
