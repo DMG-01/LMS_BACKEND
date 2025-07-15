@@ -312,30 +312,31 @@ try {
 
 const returnAllRegister = async (req: Request, res: Response) => {
   try {
-    const { date, patientId } = req.query; 
+    const { dateTaken, date, patientId } = req.query;
     const filters: any = {};
 
-    if (date) {
-      filters.date = date;
+    if (dateTaken || date) {
+      filters.dateTaken = dateTaken || date;
     }
 
     if (patientId) {
       filters.patientId = patientId;
     }
 
-const _registers = await TestVisit.findAll({
-  where: {
-    ...filters 
-  },
-  include: [
-    { model: Patient, as: "patient" },
-    { model: Service,
-      as: "services", 
-      attributes : ["name"]
-    }
-  ],
-  order: [['createdAt', 'DESC']],
-});
+    const _registers = await TestVisit.findAll({
+      where: {
+        ...filters,
+      },
+      include: [
+        { model: Patient, as: "patient" },
+        {
+          model: Service,
+          as: "services",
+          attributes: ["name"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
 
     res.status(200).json({
       data: _registers,
@@ -345,6 +346,7 @@ const _registers = await TestVisit.findAll({
     res.status(500).json({ error: err.message });
   }
 };
+
 
 const deleteARegister = async(req : Request, res : Response)=> {
 
