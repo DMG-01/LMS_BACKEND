@@ -312,21 +312,22 @@ try {
 
 const returnAllRegister = async (req: Request, res: Response) => {
   try {
-    const { dateTaken, date, patientId } = req.query;
-    const filters: any = {};
+    const { dateTaken, date, patientId, page = 1, limit = 20 } = req.query;
 
+    const filters: any = {};
     if (dateTaken || date) {
       filters.dateTaken = dateTaken || date;
     }
-
     if (patientId) {
       filters.patientId = patientId;
     }
 
-    const _registers = await TestVisit.findAll({
-      where: {
-        ...filters,
-      },
+    const _page = Number(page);
+    const _limit = Number(limit);
+    const offset = (_page - 1) * _limit;
+
+    const { count, rows } = await TestVisit.findAndCountAll({
+      where: filters,
       include: [
         { model: Patient, as: "patient" },
         {
@@ -336,16 +337,56 @@ const returnAllRegister = async (req: Request, res: Response) => {
         },
       ],
       order: [["createdAt", "DESC"]],
+      limit: _limit,
+      offset,
     });
 
+    const totalPages = Math.ceil(count / _limit);
+
+    // If no results but count exists and page is too high, retry page 1
+    if (rows.length === 0 && count > 0 && _page > totalPages) {
+      const { rows: retryRows } = await TestVisit.findAndCountAll({
+        where: filters,
+        include: [
+          { model: Patient, as: "patient" },
+          {
+            model: Service,
+            as: "services",
+            attributes: ["name"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: _limit,
+        offset: 0,
+      });
+
+      return res.status(200).json({
+        data: retryRows,
+        pagination: {
+          totalItems: count,
+          totalPages,
+          currentPage: 1,
+          limit: _limit,
+        },
+        message: "Page exceeded. Returning page 1 instead.",
+      });
+    }
+
     res.status(200).json({
-      data: _registers,
+      data: rows,
+      pagination: {
+        totalItems: count,
+        totalPages,
+        currentPage: _page,
+        limit: _limit,
+      },
       message: "Registers fetched successfully",
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 
 const deleteARegister = async(req : Request, res : Response)=> {

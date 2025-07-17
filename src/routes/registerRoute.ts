@@ -15,5 +15,5 @@ registerRouter.delete("/register/:testVisitId", deleteARegister)
 registerRouter.patch("/register/changeAmountPaid/:registerId", changeARegisterPrice)
 registerRouter.patch("/register/addService/:registerId", addServiceToRegister)
 registerRouter.patch("/register/removeService/:registerId", removeServiceFromRegisterRow)
-registerRouter.get("/register", returnAllRegister)
+registerRouter.get("/register", wrapMiddleware(returnAllRegister))
 export default registerRouter
