@@ -97,6 +97,7 @@ public  async removeService(serviceId : number){
 
 public async addService(serviceId : number ) {
 
+    console.log(`adding service`)
     const isServiceIdValid = await ServiceTemplate.findOne({
         where : {
             id : serviceId

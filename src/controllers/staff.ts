@@ -186,6 +186,52 @@ const patientHistory = async(req : Request, res : Response ) =>  {
     }
 }
 
+const returnAPatientHistory = async(req : Request, res : Response)=> {
+
+    try {
+
+        const patientHistory = await Patient.findOne({
+            where : {
+                id : req.params.patientId
+            },
+             include : [{
+            model : patientTestTable, 
+            as : "tests", 
+            include : [{
+                model : Service, 
+                as : "services", 
+                include : [{
+                    model : TestResult, 
+                    as : "testResult",
+                    include : [{
+                        model : TestParameterTemplate, 
+                        as : "parameter"
+                    }]
+                }]
+            }]
+        }]
+        })
+
+        if(!patientHistory) {
+            res.status(statusCodes.NOT_FOUND).json({
+                msg : `no patient with id ${req.params.patientId} found`
+            })
+            return
+        }
+
+        res.status(statusCodes.OK).json({
+            patientDetail : patientHistory
+        })
+        return
 
 
-export  {uploadResult, editResult, patientHistory}
+    }catch(error) {
+        res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            msg : `INTERNAL_SERVER_ERROR`
+        })
+    }
+}
+
+
+
+export  {uploadResult, editResult, patientHistory, returnAPatientHistory}
