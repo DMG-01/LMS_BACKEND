@@ -1,10 +1,18 @@
 import express, {Request, Response} from "express"
 import statusCodes from "http-status-codes"
-import {patientTestTable as TestVisit, Service, TestResult,Patient, patientTestTable, TestParameterTemplate  } from "../models/association"
+import {patientTestTable as TestVisit, Service, TestResult,Patient, patientTestTable, Staff,  TestParameterTemplate  } from "../models/association"
 import {Op} from "sequelize"
+import bcrypt from "bcryptjs"
+
 import Test from "supertest/lib/test"
 
-
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId : string, 
+    hasManegeralRole : boolean, 
+    hasAccountingRole : boolean
+  }
+}
 
 const uploadResult = async (req:Request, res : Response)=> {
 
@@ -232,6 +240,72 @@ const returnAPatientHistory = async(req : Request, res : Response)=> {
     }
 }
 
+const registerANewStaff = async (req : AuthenticatedRequest, res : Response )=> {
+
+    try {
+        const isManagement = req.user!.hasManegeralRole
+
+        if(!isManagement) {
+            res.status(statusCodes.UNAUTHORIZED).json({
+                msg : ` UNAUTUTHORIZED`
+            })
+            return
+        }
+
+        if(!req.body) {
+            res.status(statusCodes.BAD_REQUEST).json({
+                msg :`MISSING REQUEST BODY`
+            })
+            return
+        }
+
+        const {firstName, lastName, password, phoneNumber, hasManegerialRole, hasAccountingRole } = req.body
+
+        if(!firstName || !lastName || !password || !phoneNumber || !hasManegerialRole || !hasAccountingRole) {
+            res.status(statusCodes.BAD_REQUEST).json({
+                msg : `MISSING REQUIRED PARAMETER`
+            })
+            return
+        }
+
+        const salt = await bcrypt.genSalt(10)
+        const encryptedPassword = await bcrypt.hash(password, salt)
+        const newStaff = await Staff.create({
+            firstName, 
+            lastName, 
+            password : encryptedPassword, 
+            phoneNumber, 
+            hasManegerialRole, 
+            hasAccountingRole
+        })
+
+        res.status(statusCodes.CREATED).json({
+            phoneNumber, 
+            password 
+        })
+        return
+    }catch(error) {
+        res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            msg : `INTERNA;_SERVER_ERROR`, 
+            error
+        })
+        return 
+    }
+}
+
+const removeAStaff = async (req : AuthenticatedRequest, res : Response)=> {
+
+    const isManagement = req.user!.hasManegeralRole
+
+        if(!isManagement) {
+            res.status(statusCodes.UNAUTHORIZED).json({
+                msg : ` UNAUTUTHORIZED`
+            })
+            return
+        }
+}
+
+const changeStaffPermission = ()=> {}
 
 
-export  {uploadResult, editResult, patientHistory, returnAPatientHistory}
+export  {uploadResult, registerANewStaff, editResult, patientHistory, returnAPatientHistory}

@@ -135,10 +135,6 @@ const staffLogin = async (req: Request, res: Response) => {
   }
 };
 
-const registerANewStaff = ()=> {}
-
-const removeAStaff = ()=> {}
-
 
 
 export {superSignUp, staffLogin}
