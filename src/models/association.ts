@@ -9,6 +9,7 @@ import TestResult from "./testResult";
 import TestParameterTemplate from "./testParameterTemplate";
 import ServiceTemplate from "./serviceTemplate";
 import Referral  from "./referral";
+import Staff from "./staffs"
 
 
 
@@ -36,7 +37,10 @@ patientTestTable.belongsTo(Patient, { foreignKey: "patientId", as: "patient" });
 patientTestTable.hasMany(Service, { foreignKey: "testVisitId", as: "services" });
 Service.belongsTo(patientTestTable, { foreignKey: "testVisitId", as: "visit" });
 
+//STAFF  ->   RESULT
 
+Staff.hasMany(TestResult, { foreignKey : "staffId", as : "testResult"})
+TestResult.belongsTo(Staff, {foreignKey : "staffId,", as : "staff"})
 
 // SERVICE -> RESULT 
 Service.hasMany(TestResult, { foreignKey: "serviceId", as: "testResult" });
@@ -74,5 +78,6 @@ export {
   ServiceTemplate,
   TestParameterTemplate,
   Referral,
+  Staff, 
   sequelize,
 };
