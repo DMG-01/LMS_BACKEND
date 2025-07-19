@@ -42,7 +42,9 @@ const superSignUp = async(req : Request, res : Response)=> {
                 firstName, 
                 lastName, 
                 phoneNumber, 
-                password : encodedPassword
+                password : encodedPassword, 
+                hasManegerialRole : true, 
+                hasAccountingRole : true 
             })
             await firstStaff.save()
 
@@ -106,7 +108,10 @@ const staffLogin = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-      { userId: _staff.id },
+      { userId: _staff.id ,
+        hasManegeralRole : _staff.hasManegerialRole, 
+        hasAccountingRole : _staff.hasAccountingRole
+      },
       jwtSecret,
       { expiresIn: '1d' }
     );

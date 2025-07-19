@@ -15,6 +15,8 @@ declare firstName : string
 declare lastName : string
 declare password : string 
 declare phoneNumber : string 
+declare hasManegerialRole : boolean
+declare hasAccountingRole : boolean
 }
 
 Staff.init({
@@ -39,6 +41,16 @@ Staff.init({
     phoneNumber : {
         type : DataTypes.STRING, 
         allowNull : false, 
+    },
+    hasManegerialRole : {
+        type : DataTypes.BOOLEAN, 
+        allowNull : false, 
+        defaultValue : false
+    }, 
+    hasAccountingRole : {
+        type : DataTypes.BOOLEAN, 
+        allowNull : false, 
+        defaultValue : false
     }
 }, {
     sequelize, 
