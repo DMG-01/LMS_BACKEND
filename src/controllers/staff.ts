@@ -335,7 +335,44 @@ const tivateStaff = async (req : AuthenticatedRequest, res : Response)=> {
 
 }
 
-const changeStaffPermission = ()=> {}
+const changeStaffPermission = async(req : AuthenticatedRequest, res : Response)=> {
+
+    try {
+    const isManagement = req.user!.hasManegeralRole
+
+        if(!isManagement) {
+            res.status(statusCodes.UNAUTHORIZED).json({
+                msg : ` UNAUTUTHORIZED`
+            })
+            return
+        }
+
+        const staffRoleToChange = await Staff.findOne({
+            where : {
+                id :req.params.serviceId
+            }
+        })
+        if(!staffRoleToChange) {
+            res.status(statusCodes.NOT_FOUND).json({
+                msg : `NOT_FOUND`
+            })
+        }
+
+        Object.assign(staffRoleToChange!, req.body)
+        await staffRoleToChange?.save()
+
+        res.status(statusCodes.OK).json({
+            msg : `PERMISSION SUCCS00SFULLY CHANGED`, 
+            staffRoleToChange
+        })
+        return
+    }catch(error) {
+        res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            msg : ` INTERNAL_SERVER_ERROR`, 
+            error
+        })
+    }
+}
 
 
-export  {uploadResult, registerANewStaff, tivateStaff, editResult, patientHistory, returnAPatientHistory}
+export  {uploadResult,changeStaffPermission,  registerANewStaff, tivateStaff, editResult, patientHistory, returnAPatientHistory}
