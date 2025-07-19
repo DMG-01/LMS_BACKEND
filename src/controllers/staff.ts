@@ -276,7 +276,8 @@ const registerANewStaff = async (req : AuthenticatedRequest, res : Response )=> 
             password : encryptedPassword, 
             phoneNumber, 
             hasManegerialRole, 
-            hasAccountingRole
+            hasAccountingRole, 
+            status : true
         })
 
         res.status(statusCodes.CREATED).json({
@@ -293,8 +294,8 @@ const registerANewStaff = async (req : AuthenticatedRequest, res : Response )=> 
     }
 }
 
-const removeAStaff = async (req : AuthenticatedRequest, res : Response)=> {
-
+const tivateStaff = async (req : AuthenticatedRequest, res : Response)=> {
+    try {
     const isManagement = req.user!.hasManegeralRole
 
         if(!isManagement) {
@@ -303,9 +304,38 @@ const removeAStaff = async (req : AuthenticatedRequest, res : Response)=> {
             })
             return
         }
+
+        const staffToTivate = await Staff.findOne({
+            where : {
+                id : req.params.staffId
+            }
+        })
+
+        if(!staffToTivate) {
+            res.status(statusCodes.NOT_FOUND).json({
+                msg: `NO STAFF WITH ID ${req.params.staffId}`
+            })
+            return
+        }
+
+        staffToTivate.status = !staffToTivate.status
+        await staffToTivate.save()
+        res.status(statusCodes.OK).json({
+            msg : `STATUS CHANGED`, 
+            
+        })
+        return
+    }catch(error) {
+        res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            msg : `INTERNAL_SERVER_ERROR`, 
+            error
+        })
+        return
+    }
+
 }
 
 const changeStaffPermission = ()=> {}
 
 
-export  {uploadResult, registerANewStaff, editResult, patientHistory, returnAPatientHistory}
+export  {uploadResult, registerANewStaff, tivateStaff, editResult, patientHistory, returnAPatientHistory}

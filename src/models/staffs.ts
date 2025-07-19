@@ -17,6 +17,7 @@ declare password : string
 declare phoneNumber : string 
 declare hasManegerialRole : boolean
 declare hasAccountingRole : boolean
+declare status : boolean
 }
 
 Staff.init({
@@ -51,6 +52,11 @@ Staff.init({
         type : DataTypes.BOOLEAN, 
         allowNull : false, 
         defaultValue : false
+    }, 
+    status : {
+        type : DataTypes.BOOLEAN, 
+        allowNull : false, 
+        defaultValue : true
     }
 }, {
     sequelize, 

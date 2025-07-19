@@ -44,7 +44,8 @@ const superSignUp = async(req : Request, res : Response)=> {
                 phoneNumber, 
                 password : encodedPassword, 
                 hasManegerialRole : true, 
-                hasAccountingRole : true 
+                hasAccountingRole : true,
+                status : true
             })
             await firstStaff.save()
 
