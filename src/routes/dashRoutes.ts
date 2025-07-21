@@ -1,7 +1,7 @@
 import express, {RequestHandler} from "express"
 import {getAllPatient, getAPatientHistory} from "../controllers/dash"
-import staffAuthentication from "../middleware/authentiction";
 const dashRouter = express.Router()
+import staffAuthentication from "../middleware/authentiction";
 
 const wrapMiddleware = (fn: Function): RequestHandler => {
   return (req, res, next) => {
