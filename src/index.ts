@@ -7,13 +7,16 @@ import staffsRouter from "./routes//staffs"
 import dashRouter from "./routes/dashRoutes";
 import referralRouter from "./routes/referralRoute";
 import cors from "cors"
+import cookieParser from "cookie-parser"
 import { Sequelize } from "sequelize";
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+
 app.use(express.json());
+app.use(cookieParser())
 app.use(cors())
 app.use(serviceRouter)
 app.use(registerRouter)
