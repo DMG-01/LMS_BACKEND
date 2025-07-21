@@ -1,6 +1,7 @@
 import express, {Request, Response, RequestHandler} from "express"
 import {RegisterAPatient,returnAllRegister, addServiceToRegister,deleteARegister, removeServiceFromRegisterRow, changeARegisterPrice, returnARegisterDetail} from "../controllers/register"
 import statusCodes from "http-status-codes"
+import staffAuthentication from "../middleware/authentiction";
 
 const registerRouter = express.Router()
 const wrapMiddleware = (fn: Function): RequestHandler => {
@@ -9,11 +10,11 @@ const wrapMiddleware = (fn: Function): RequestHandler => {
   };
 };
 
-registerRouter.post("/register", wrapMiddleware(RegisterAPatient))
-registerRouter.get("/register/:registerId", returnARegisterDetail)
-registerRouter.delete("/register/:testVisitId", deleteARegister)
-registerRouter.patch("/register/changeAmountPaid/:registerId", changeARegisterPrice)
-registerRouter.patch("/register/addService/:registerId", addServiceToRegister)
-registerRouter.patch("/register/removeService/:registerId", removeServiceFromRegisterRow)
-registerRouter.get("/register", wrapMiddleware(returnAllRegister))
+registerRouter.post("/register", wrapMiddleware(staffAuthentication), wrapMiddleware(RegisterAPatient))
+registerRouter.get("/register/:registerId",wrapMiddleware(staffAuthentication), returnARegisterDetail)
+registerRouter.delete("/register/:testVisitId",wrapMiddleware(staffAuthentication), deleteARegister)
+registerRouter.patch("/register/changeAmountPaid/:registerId",wrapMiddleware(staffAuthentication), changeARegisterPrice)
+registerRouter.patch("/register/addService/:registerId",wrapMiddleware(staffAuthentication), addServiceToRegister)
+registerRouter.patch("/register/removeService/:registerId", wrapMiddleware(staffAuthentication),removeServiceFromRegisterRow)
+registerRouter.get("/register",wrapMiddleware(staffAuthentication), wrapMiddleware(returnAllRegister))
 export default registerRouter
