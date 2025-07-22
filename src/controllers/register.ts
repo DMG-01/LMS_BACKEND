@@ -312,7 +312,7 @@ try {
 
 const returnAllRegister = async (req: Request, res: Response) => {
   try {
-    const { dateTaken, date, firstName, lastName,  patientId, page = 1, limit = 20 } = req.query;
+    const { dateTaken, date, firstName, lastName, labNumber,   patientId, page = 1, limit = 20 } = req.query;
 
     const filters: any = {};
     const patientFilters : any = {}
@@ -328,6 +328,10 @@ const returnAllRegister = async (req: Request, res: Response) => {
 
     if(lastName) {
       patientFilters.lastName = lastName 
+    }
+
+    if(labNumber) {
+      filters.id = labNumber
     }
     const _page = Number(page);
     const _limit = Number(limit);
