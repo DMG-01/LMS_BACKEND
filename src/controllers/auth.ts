@@ -121,6 +121,7 @@ const staffLogin = async (req: Request, res: Response) => {
     res.cookie('accesstoken', token, {
       httpOnly: true,
       sameSite: 'strict',
+      secure : false,
       maxAge: 24 * 60 * 60 * 1000, 
     });
 
