@@ -312,16 +312,23 @@ try {
 
 const returnAllRegister = async (req: Request, res: Response) => {
   try {
-    const { dateTaken, date, patientId, page = 1, limit = 20 } = req.query;
+    const { dateTaken, date, firstName, lastName,  patientId, page = 1, limit = 20 } = req.query;
 
     const filters: any = {};
+    const patientFilters : any = {}
     if (dateTaken || date) {
       filters.dateTaken = dateTaken || date;
     }
     if (patientId) {
       filters.patientId = patientId;
     }
+    if(firstName) {
+      patientFilters.firstName = firstName 
+    }
 
+    if(lastName) {
+      patientFilters.lastName = lastName 
+    }
     const _page = Number(page);
     const _limit = Number(limit);
     const offset = (_page - 1) * _limit;
@@ -329,7 +336,7 @@ const returnAllRegister = async (req: Request, res: Response) => {
     const { count, rows } = await TestVisit.findAndCountAll({
       where: filters,
       include: [
-        { model: Patient, as: "patient" },
+        { model: Patient, as: "patient", where : patientFilters },
         {
           model: Service,
           as: "services",
