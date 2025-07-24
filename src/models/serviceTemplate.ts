@@ -150,11 +150,7 @@ serviceTemplate.init(
     price: {
       allowNull: false,
       type: DataTypes.FLOAT,
-    }/*,
-    serviceTemplateId : {
-        type : DataTypes.INTEGER, 
-        allowNull : false, 
-    }*/
+    }
   },
   {
     sequelize,

@@ -156,13 +156,14 @@ const patientHistory = async(req : Request, res : Response ) =>  {
 
             const where: any = {};
 
-    if (firstName) where.firstName = { [Op.like]: `%${firstName}%` };
-    if (lastName) where.lastName = { [Op.like]: `%${lastName}%` };
-    if (phoneNumber) where.phoneNumber = { [Op.like]: `%${phoneNumber}%` };
-    if (email) where.phoneNumber = { [Op.like]: `%${email}%` };
+    if (firstName) where.firstName = firstName
+    if (lastName) where.lastName = lastName
+    if (phoneNumber) where.phoneNumber = phoneNumber
+    if (email) where.email = email
 
+        let _patientHistory
 
-    const _patientHistory = await Patient.findAll({
+     _patientHistory = await Patient.findAll({
         where, 
         include : [{
             model : patientTestTable, 
