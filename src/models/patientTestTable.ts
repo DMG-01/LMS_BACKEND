@@ -129,7 +129,7 @@ public async addService(serviceId : number ) {
 }else {
     return {
         status : 0,
-        msg : `serivice of id ${serviceId} already exist`
+        msg : `serivice already exist`
     }
 }
 

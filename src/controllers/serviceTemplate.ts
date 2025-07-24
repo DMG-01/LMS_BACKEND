@@ -232,11 +232,20 @@ const removeProperty =  async (req :Request, res : Response)=> {
 const getAllServices = async(req:Request, res : Response)=> {
 
     try {
+
+        const {name} = req.query
+        const filters : any  = {}
+
+        if(name) {
+            filters.name = name
+        }
+        
         const _AllServices = await ServiceTemplate.findAll({
             include : [{
                 model : TestParameterTemplate, 
                 as : "testParameters"
-            }]
+            }], 
+            where : filters
         })
 
         if(_AllServices.length < 1) {
