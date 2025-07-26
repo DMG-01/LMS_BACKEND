@@ -21,10 +21,13 @@ interface PatientData {
   phoneNumber: string;
   email?: string;
   dateOfBirth?: string;
-  amountPaid: number;
+  amountPaidInCash?: number;
+  amountPaidWithPos? : number, 
+  amountPaidInTransfer? : number
 }
 
 const RegisterAPatient = async (req: Request, res: Response) => {
+  console.log(`registering...`)
   if (!req.body) {
     return res.status(statusCodes.BAD_REQUEST).json({ msg: "missing required parameter" });
   }
@@ -80,7 +83,9 @@ const RegisterAPatient = async (req: Request, res: Response) => {
     const register = await TestVisit.create({
       patientId: _patient.id,
       status: "uncompleted",
-      amountPaid: patientData.amountPaid,
+      amountPaidInCash: patientData.amountPaidInCash? patientData.amountPaidInCash : 0,
+      amountPaidWithPos : patientData.amountPaidWithPos? patientData.amountPaidWithPos : 0, 
+      amountPaidInTransfer : patientData.amountPaidInTransfer ? patientData.amountPaidInTransfer : 0,
       referralId: referralId, // <-- Always included (either actual ID or null)
       dateTaken: new Date().toISOString().split("T")[0]
     });
@@ -166,9 +171,9 @@ const changeARegisterPrice = async(req : Request, res : Response)=> {
   }
 
 
-  const {newPrice} = req.body 
+  const {newPrice, methodOfPayment} = req.body 
 
-  if(!newPrice) {
+  if(!newPrice || methodOfPayment === "cash" || "transfer" || "POS") {
     res.status(statusCodes.BAD_REQUEST).json({
       msg : `missing required parameter `
     })
@@ -188,7 +193,7 @@ const changeARegisterPrice = async(req : Request, res : Response)=> {
     return
   }
 
-  const response = await _registerToChange.changeAmountPaid(newPrice)
+  const response = await _registerToChange.changeAmountPaid(newPrice, methodOfPayment)
   res.status(statusCodes.OK).json({
     msg : response!.msg
   })

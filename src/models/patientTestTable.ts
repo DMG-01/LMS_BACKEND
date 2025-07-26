@@ -9,9 +9,11 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
     declare patientId : number
     declare status : string
     declare dateTaken : string
-    declare amountPaid : number
-   declare referralId: CreationOptional<number> | null;
-
+    declare amountPaidInCash :  CreationOptional<number>
+    declare amountPaidInTransfer :  CreationOptional<number>
+    declare amountPaidWithPos : CreationOptional<number>
+    declare referralId: CreationOptional<number> | null;
+   
 
     public async getRegisterDetail() {
           try {
@@ -60,8 +62,20 @@ class PatientTest extends Model<InferAttributes<PatientTest>, InferCreationAttri
     }
 
 
-public async changeAmountPaid(newAmountPaid : number) {
-         this.amountPaid = newAmountPaid
+public async changeAmountPaid(newAmountPaid : number, methodOfPayment : string) {
+        
+    if(methodOfPayment === "cash") {
+        this.amountPaidInCash = newAmountPaid
+    }
+
+         if(methodOfPayment === "POS") {
+        this.amountPaidWithPos = newAmountPaid
+    }
+
+     if(methodOfPayment === "transfer") {
+        this.amountPaidInTransfer = newAmountPaid
+    }
+
          await this.save()
          return {
             success : 1, 
@@ -164,10 +178,18 @@ PatientTest.init({
         defaultValue :"uncompleted", 
         allowNull : false
     }, 
-    amountPaid : {
+    amountPaidInCash : {
         type : DataTypes.INTEGER, 
-        allowNull : false
+        allowNull : true
     }, 
+    amountPaidInTransfer : {
+        type : DataTypes.INTEGER, 
+        allowNull : true
+    },
+    amountPaidWithPos : {
+        type : DataTypes.INTEGER, 
+        allowNull : true
+    },
     dateTaken : {
         type : DataTypes.DATEONLY, 
         allowNull : false
