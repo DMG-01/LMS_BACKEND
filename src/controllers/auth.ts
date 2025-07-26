@@ -137,7 +137,18 @@ const staffLogin = async (req: Request, res: Response) => {
   }
 };
 
+const validateToken = (req : Request, res : Response)=> {
+  try {
+     res.status(statusCodes.OK).json({
+      msg : ` cookie valid`
+    })
+     return
+  }catch(error) {
+    throw new Error()
+  }
+}
 
 
-export {superSignUp, staffLogin}
+
+export {superSignUp,validateToken,  staffLogin}
 

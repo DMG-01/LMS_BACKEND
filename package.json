@@ -4,6 +4,7 @@
   "description": "lab management sytem built with typescript and mysql ",
   "main": "index.js",
   "scripts": {
+    "build" : "tsc",
     "test": "jest",
     "dev": "nodemon src/index.ts"
   },

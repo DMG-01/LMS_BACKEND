@@ -1,5 +1,7 @@
 import express, {RequestHandler}  from "express"
-import {superSignUp, staffLogin} from "../controllers/auth"
+import {superSignUp, validateToken,  staffLogin} from "../controllers/auth"
+import { wrap } from "module";
+import staffAuthentication from "../middleware/authentiction";
 
 const auth = express.Router()
 
@@ -11,5 +13,6 @@ const wrapMiddleware = (fn: Function): RequestHandler => {
 
 auth.post(`/super/signup`, superSignUp)
 auth.post(`/staff/login`, wrapMiddleware(staffLogin))
+auth.get("/auth", wrapMiddleware(staffAuthentication), validateToken)
 
 export default auth
