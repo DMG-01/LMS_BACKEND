@@ -140,6 +140,12 @@ public async addService(serviceId : number ) {
     }
 }
 
+public async toggleStatus() {
+    this.status === "uncompleted"? this.status = "completed" : this.status = "uncompleted"
+    await this.save()
+    return this.status
+}
+
 }
 PatientTest.init({
 

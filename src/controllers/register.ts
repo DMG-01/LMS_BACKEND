@@ -13,6 +13,7 @@ import {
   
 } from "../models/association";
 import serviceTemplate from "../models/serviceTemplate";
+import PatientTest from "../models/patientTestTable";
 
 interface PatientData {
   firstName: string;
@@ -420,4 +421,35 @@ const deleteARegister = async(req : Request, res : Response)=> {
   })
   return
 }
-export {RegisterAPatient,addServiceToRegister,deleteARegister, removeServiceFromRegisterRow, returnAllRegister, changeARegisterPrice, returnARegisterDetail}
+
+
+const changeARegisterStatus = async(req : Request, res : Response)=> {
+
+  try {
+
+     const _register = await TestVisit.findOne({
+    where : {
+      id : req.params.testVisitId
+    }
+  })
+
+  if(!_register) {
+    res.status(statusCodes.NOT_FOUND).json({
+      msg : `NOT_FOUND`
+    })
+    return
+  }
+const status = await _register.toggleStatus()
+res.status(statusCodes.OK).json({
+  msg : `${status}`
+})
+
+return 
+  }catch(error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      msg : `AN INTERNAL_SERVER_ERROR_OCCURED`
+    })
+    return
+  }
+}
+export {RegisterAPatient,changeARegisterStatus,addServiceToRegister,deleteARegister, removeServiceFromRegisterRow, returnAllRegister, changeARegisterPrice, returnARegisterDetail}
